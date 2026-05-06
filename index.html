@@ -1,0 +1,2472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Estimate Calculator — Florida</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root {
+    --orange: #E8541A;
+    --orange-dark: #C23D0D;
+    --orange-light: #FFF0EB;
+    --dark: #1A1612;
+    --gray-900: #2C2416;
+    --gray-700: #5C4F3D;
+    --gray-500: #8C7E6E;
+    --gray-300: #C8BEB2;
+    --gray-100: #F5F0EB;
+    --white: #FDFAF7;
+    --success: #2D7D3A;
+    --blue: #1A5FAB;
+    --shadow: 0 2px 16px rgba(26,22,18,0.10);
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--gray-100);
+    color: var(--dark);
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+
+  /* HEADER */
+  .app-header {
+    background: var(--dark);
+    color: var(--white);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--orange); }
+  .header-badge {
+    font-size: 11px;
+    background: var(--orange);
+    color: white;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  /* NAV TABS */
+  .nav-tabs {
+    background: var(--dark);
+    display: flex;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .nav-tab {
+    flex: 1;
+    min-width: 80px;
+    padding: 10px 8px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--gray-300);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .nav-tab.active {
+    color: var(--orange);
+    border-bottom-color: var(--orange);
+  }
+  .nav-tab i { display: block; font-size: 18px; margin-bottom: 2px; }
+
+  /* MAIN CONTENT */
+  .main { max-width: 720px; margin: 0 auto; padding: 16px; }
+
+  /* SECTION TITLES */
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--dark);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--gray-300);
+    margin-left: 8px;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  /* CLIENT FORM */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+  }
+  .form-field input, .form-field select, .form-field textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--dark);
+    background: var(--white);
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  .form-field input:focus, .form-field select:focus, .form-field textarea:focus {
+    border-color: var(--orange);
+  }
+  .form-field.full { grid-column: 1 / -1; }
+  .form-field textarea { resize: vertical; min-height: 60px; }
+
+  /* SERVICE CATEGORIES */
+  .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .cat-btn {
+    padding: 12px 8px;
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    background: var(--white);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .cat-btn:active { transform: scale(0.97); }
+  .cat-btn.active { border-color: var(--orange); background: var(--orange-light); }
+  .cat-btn i { font-size: 24px; color: var(--gray-500); display: block; margin-bottom: 4px; }
+  .cat-btn.active i { color: var(--orange); }
+  .cat-btn span { font-size: 12px; font-weight: 600; color: var(--gray-700); }
+  .cat-btn.active span { color: var(--orange-dark); }
+
+  /* SERVICE ITEMS */
+  .service-item {
+    border: 1.5px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    margin-bottom: 8px;
+    background: var(--white);
+    transition: border-color 0.2s;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .service-item.selected { border-color: var(--orange); background: var(--orange-light); }
+  .service-item-header { display: flex; align-items: flex-start; gap: 10px; }
+  .service-check {
+    width: 20px; height: 20px; min-width: 20px;
+    border: 2px solid var(--gray-300);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    margin-top: 1px;
+  }
+  .service-item.selected .service-check {
+    background: var(--orange);
+    border-color: var(--orange);
+    color: white;
+  }
+  .service-info { flex: 1; }
+  .service-name { font-weight: 600; font-size: 14px; color: var(--dark); margin-bottom: 2px; }
+  .service-desc { font-size: 12px; color: var(--gray-500); line-height: 1.4; }
+  .service-price-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--success);
+    white-space: nowrap;
+    padding: 3px 8px;
+    background: #EAF5EB;
+    border-radius: 6px;
+    margin-top: 1px;
+  }
+  .service-controls {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--gray-300);
+    display: none;
+  }
+  .service-item.selected .service-controls { display: block; }
+  .qty-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .qty-label { font-size: 12px; color: var(--gray-700); font-weight: 500; min-width: 60px; }
+  .qty-input {
+    width: 90px;
+    padding: 7px 10px;
+    border: 1.5px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-family: 'DM Mono', monospace;
+    color: var(--dark);
+    background: var(--white);
+    outline: none;
+    -webkit-appearance: none;
+  }
+  .qty-input:focus { border-color: var(--orange); }
+  .qty-unit { font-size: 12px; color: var(--gray-500); }
+  .qty-total {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--orange-dark);
+    margin-left: auto;
+  }
+
+  /* SUMMARY BAR */
+  .summary-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--dark);
+    color: var(--white);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 200;
+    gap: 12px;
+  }
+  .summary-total { font-family: 'DM Mono', monospace; }
+  .summary-label { font-size: 11px; color: var(--gray-300); text-transform: uppercase; letter-spacing: 0.5px; }
+  .summary-amount { font-size: 22px; font-weight: 500; color: var(--orange); line-height: 1.2; }
+  .btn-primary {
+    background: var(--orange);
+    color: white;
+    border: none;
+    padding: 11px 20px;
+    border-radius: var(--radius-sm);
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.2s;
+  }
+  .btn-primary:active { background: var(--orange-dark); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--white);
+    border: 1.5px solid rgba(255,255,255,0.25);
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-secondary:active { background: rgba(255,255,255,0.08); }
+
+  /* ESTIMATE SUMMARY TAB */
+  .estimate-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--gray-100);
+    font-size: 13px;
+  }
+  .estimate-line:last-child { border-bottom: none; }
+  .estimate-line .line-name { color: var(--gray-700); flex: 1; }
+  .estimate-line .line-qty { color: var(--gray-500); font-size: 12px; margin-right: 12px; }
+  .estimate-line .line-price {
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    color: var(--dark);
+  }
+  .estimate-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0 0;
+    border-top: 2px solid var(--dark);
+    margin-top: 8px;
+  }
+  .estimate-total-label { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; }
+  .estimate-total-val { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 500; color: var(--orange); }
+  .tax-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--gray-500);
+    padding: 6px 0 0;
+  }
+
+  /* NOTES */
+  .notes-tag {
+    display: inline-block;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    margin: 3px;
+    cursor: pointer;
+    background: var(--gray-100);
+    border: 1.5px solid var(--gray-300);
+    color: var(--gray-700);
+    -webkit-tap-highlight-color: transparent;
+    transition: all 0.15s;
+  }
+  .notes-tag:active { background: var(--orange-light); border-color: var(--orange); color: var(--orange-dark); }
+
+  /* DISCOUNT / TAX */
+  .inline-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .pill-toggle {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--gray-300);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--white);
+    color: var(--gray-700);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .pill-toggle.active { background: var(--orange); border-color: var(--orange); color: white; }
+
+  /* HIDDEN / VISIBLE */
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+
+  /* PDF PREVIEW */
+  .pdf-meta-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--gray-500); margin-bottom: 4px; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(26,22,18,0.7);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 24px;
+    max-width: 440px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .modal h2 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; margin-bottom: 8px; }
+  .modal p { font-size: 14px; color: var(--gray-700); margin-bottom: 16px; line-height: 1.5; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+  .btn-outline {
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--gray-300);
+    background: transparent;
+    color: var(--gray-700);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .btn-confirm {
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: var(--orange);
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .form-field.full { grid-column: 1; }
+    .cat-grid { grid-template-columns: 1fr 1fr; }
+    .summary-bar { flex-wrap: wrap; }
+    .btn-primary { flex: 1; justify-content: center; }
+  }
+
+  /* Utility */
+  .mt-12 { margin-top: 12px; }
+  .mt-16 { margin-top: 16px; }
+  .mb-8 { margin-bottom: 8px; }
+  .text-sm { font-size: 13px; }
+  .text-muted { color: var(--gray-500); }
+  .text-success { color: var(--success); }
+  .font-mono { font-family: 'DM Mono', monospace; }
+  .bold { font-weight: 600; }
+  .flex { display: flex; }
+  .items-center { align-items: center; }
+  .gap-8 { gap: 8px; }
+  .icon-big { font-size: 32px; }
+
+  /* Warning banner */
+  .info-banner {
+    background: #FFF7EB;
+    border: 1.5px solid #F5C95A;
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #7A5A10;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--gray-500);
+  }
+  .empty-state i { font-size: 48px; opacity: 0.3; display: block; margin-bottom: 12px; }
+  .empty-state p { font-size: 14px; }
+
+  .remove-item-btn {
+    background: none;
+    border: none;
+    color: var(--gray-300);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 2px;
+    line-height: 1;
+  }
+  .remove-item-btn:active { color: #E24B4A; }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="logo" id="header-logo" style="font-size:17px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Estimate App</div>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <button id="lang-toggle" onclick="toggleLang()" style="background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.25);color:white;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">RU</button>
+    <div class="header-badge">Florida · May 2026</div>
+  </div>
+</header>
+
+<nav class="nav-tabs">
+  <div class="nav-tab active" onclick="switchTab('client')">
+    <i>👤</i><span data-i18n="tab_client">Client</span>
+  </div>
+  <div class="nav-tab" onclick="switchTab('exterior')">
+    <i>🏠</i><span data-i18n="tab_exterior">Exterior</span>
+  </div>
+  <div class="nav-tab" onclick="switchTab('interior')">
+    <i>🛋️</i><span data-i18n="tab_interior">Interior</span>
+  </div>
+  <div class="nav-tab" onclick="switchTab('drywall')">
+    <i>🪣</i><span data-i18n="tab_drywall">Drywall</span>
+  </div>
+  <div class="nav-tab" onclick="switchTab('handyman')">
+    <i>🔧</i><span data-i18n="tab_handyman">Handyman</span>
+  </div>
+  <div class="nav-tab" onclick="switchTab('summary')">
+    <i>📋</i><span data-i18n="tab_summary">Summary</span>
+  </div>
+</nav>
+
+<!-- ==================== TAB: CLIENT ==================== -->
+<div id="tab-client" class="tab-pane active">
+  <div class="main">
+    <div class="card">
+      <div class="section-title" data-i18n="sect_estimate_info">Estimate Info</div>
+      <div class="form-grid">
+        <div class="form-field full">
+          <label data-i18n="lbl_company">Company / Your Name</label>
+          <input type="text" id="company_name" data-i18n-ph="ph_company" placeholder="e.g. Pro Painters LLC">
+        </div>
+        <div class="form-field">
+          <label data-i18n="lbl_est_num">Estimate #</label>
+          <input type="text" id="est_number" placeholder="EST-001">
+        </div>
+        <div class="form-field">
+          <label data-i18n="lbl_date">Date</label>
+          <input type="date" id="est_date">
+        </div>
+        <div class="form-field">
+          <label data-i18n="lbl_valid">Valid Until</label>
+          <input type="date" id="est_valid">
+        </div>
+        <div class="form-field">
+          <label data-i18n="lbl_your_phone">Your Phone</label>
+          <input type="tel" id="company_phone" placeholder="(813) 000-0000">
+        </div>
+        <div class="form-field full">
+          <label data-i18n="lbl_your_email">Your Email</label>
+          <input type="email" id="company_email" placeholder="you@email.com">
+        </div>
+        <div class="form-field full">
+          <label data-i18n="lbl_license">Your License # (if applicable)</label>
+          <input type="text" id="company_license" placeholder="FL-CGC...">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title" data-i18n="sect_client_info">Client Info</div>
+      <div class="form-grid">
+        <div class="form-field">
+          <label data-i18n="lbl_client_name">Client Name</label>
+          <input type="text" id="client_name" data-i18n-ph="ph_client_name" placeholder="John Smith">
+        </div>
+        <div class="form-field">
+          <label data-i18n="lbl_phone">Phone</label>
+          <input type="tel" id="client_phone" placeholder="(813) 555-0000">
+        </div>
+        <div class="form-field full">
+          <label data-i18n="lbl_email">Email</label>
+          <input type="email" id="client_email" placeholder="client@email.com">
+        </div>
+        <div class="form-field full">
+          <label data-i18n="lbl_address">Property Address</label>
+          <input type="text" id="client_address" data-i18n-ph="ph_address" placeholder="123 Main St, Tampa, FL 33601">
+        </div>
+        <div class="form-field">
+          <label data-i18n="lbl_prop_type">Property Type</label>
+          <select id="prop_type">
+            <option data-i18n="opt_sfh">Single Family Home</option>
+            <option data-i18n="opt_townhouse">Townhouse</option>
+            <option data-i18n="opt_condo">Condo / Apt</option>
+            <option data-i18n="opt_commercial">Commercial</option>
+            <option data-i18n="opt_multifam">Multi-Family</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label data-i18n="lbl_sqft">Sq. Footage (approx.)</label>
+          <input type="number" id="prop_sqft" placeholder="1800">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title" data-i18n="sect_pricing">Pricing Options</div>
+      <div class="form-grid">
+        <div class="form-field">
+          <label data-i18n="lbl_discount">Discount ($)</label>
+          <input type="number" id="discount_amt" placeholder="0" min="0" oninput="recalcTotal()">
+        </div>
+        <div class="form-field">
+          <label data-i18n="lbl_deposit">Deposit Required ($)</label>
+          <input type="number" id="deposit_amt" placeholder="0" min="0">
+        </div>
+        <div class="form-field full">
+          <label data-i18n="lbl_pay_terms">Payment Terms</label>
+          <select id="pay_terms">
+            <option data-i18n="opt_pay1">50% deposit, balance upon completion</option>
+            <option data-i18n="opt_pay2">Payment due upon completion</option>
+            <option data-i18n="opt_pay3">Net 15 days after completion</option>
+            <option data-i18n="opt_pay4">Net 30 days after completion</option>
+            <option data-i18n="opt_pay5">Full payment upfront</option>
+            <option data-i18n="opt_pay6">Weekly billing</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title" data-i18n="sect_notes">Notes & Terms</div>
+      <div class="form-field mb-8">
+        <label data-i18n="lbl_job_notes">Job Notes</label>
+        <textarea id="job_notes" data-i18n-ph="ph_notes" placeholder="Describe work scope, special requirements, access info..."></textarea>
+      </div>
+      <div style="margin-bottom:10px">
+        <div style="font-size:12px;color:var(--gray-500);margin-bottom:6px;" data-i18n="lbl_quick_add">Quick add:</div>
+        <span class="notes-tag" onclick="addNote(T('note1'))"><span data-i18n="note1">Color selections by client</span></span>
+        <span class="notes-tag" onclick="addNote(T('note2'))"><span data-i18n="note2">Furniture moved by owner</span></span>
+        <span class="notes-tag" onclick="addNote(T('note3'))"><span data-i18n="note3">Labor only</span></span>
+        <span class="notes-tag" onclick="addNote(T('note4'))"><span data-i18n="note4">1-2 day job</span></span>
+        <span class="notes-tag" onclick="addNote(T('note5'))"><span data-i18n="note5">Primer + 2 coats</span></span>
+        <span class="notes-tag" onclick="addNote(T('note6'))"><span data-i18n="note6">FL-grade paint</span></span>
+        <span class="notes-tag" onclick="addNote(T('note7'))"><span data-i18n="note7">Full prep included</span></span>
+      </div>
+      <div class="form-field">
+        <label data-i18n="lbl_std_terms">Standard Terms</label>
+        <textarea id="std_terms" style="font-size:12px; line-height:1.5;">• Client responsible for selecting paint colors prior to start.
+• Estimate valid for 30 days from date issued.
+• Additional charges may apply for unforeseen conditions (water damage, mold, etc.).
+• Payment per agreed terms above.
+• Contractor maintains general liability insurance.
+• Scope of work does not include drywall repair unless specified.</textarea>
+      </div>
+    </div>
+
+    <button class="btn-primary" style="width:100%;justify-content:center;padding:14px;" onclick="switchTab('exterior')">
+      <span data-i18n="btn_next_services">Next: Add Services →</span>
+    </button>
+  </div>
+</div>
+
+<!-- ==================== TAB: EXTERIOR ==================== -->
+<div id="tab-exterior" class="tab-pane">
+  <div class="main">
+    <div class="info-banner" data-i18n="banner_exterior">Prices reflect Florida market rates (May 2026). Labor + materials included unless noted. Tap a service to set quantity.</div>
+    <div id="services-exterior"></div>
+  </div>
+</div>
+
+<!-- ==================== TAB: INTERIOR ==================== -->
+<div id="tab-interior" class="tab-pane">
+  <div class="main">
+    <div class="info-banner" data-i18n="banner_interior">Interior pricing per sq ft. Florida humid climate — mold-resistant paints recommended.</div>
+    <div id="services-interior"></div>
+  </div>
+</div>
+
+<!-- ==================== TAB: DRYWALL / TEXTURE ==================== -->
+<div id="tab-drywall" class="tab-pane">
+  <div class="main">
+    <div class="info-banner" data-i18n="banner_drywall">Drywall, textures & ceilings. Florida May 2026 rates. Orange peel, knockdown, skip trowel, skim coat and more.</div>
+    <div id="services-drywall"></div>
+  </div>
+</div>
+
+<!-- ==================== TAB: HANDYMAN ==================== -->
+<div id="tab-handyman" class="tab-pane">
+  <div class="main">
+    <div class="info-banner" data-i18n="banner_handyman">Handyman / repair services. Prices per unit or hourly. Labor only unless noted.</div>
+    <div id="services-handyman"></div>
+  </div>
+</div>
+
+<!-- ==================== TAB: SUMMARY ==================== -->
+<div id="tab-summary" class="tab-pane">
+  <div class="main">
+    <div class="card">
+      <div class="section-title" data-i18n="sect_summary">Estimate Summary</div>
+      <div id="summary-content">
+        <div class="empty-state">
+          <i>📋</i>
+          <p data-i18n="empty_summary">No services selected yet.<br>Go to Exterior, Interior, or Handyman tabs to add services.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title" data-i18n="sect_pdf_preview">PDF Invoice Preview</div>
+      <div id="pdf-preview-info" style="font-size:13px;color:var(--gray-700);line-height:1.6;">
+        <div class="pdf-meta-row">
+          <span data-i18n="prev_company">Company:</span><span class="font-mono bold" id="prev-company">—</span>
+        </div>
+        <div class="pdf-meta-row">
+          <span data-i18n="prev_client">Client:</span><span class="font-mono bold" id="prev-client">—</span>
+        </div>
+        <div class="pdf-meta-row">
+          <span data-i18n="prev_address">Address:</span><span class="font-mono" id="prev-address">—</span>
+        </div>
+        <div class="pdf-meta-row">
+          <span data-i18n="prev_estnum">Estimate #:</span><span class="font-mono" id="prev-estnum">—</span>
+        </div>
+        <div class="pdf-meta-row">
+          <span data-i18n="prev_date">Date:</span><span class="font-mono" id="prev-date">—</span>
+        </div>
+        <div class="pdf-meta-row">
+          <span data-i18n="prev_valid">Valid Until:</span><span class="font-mono" id="prev-valid">—</span>
+        </div>
+      </div>
+      <div style="margin-top:14px;">
+        <div style="font-size:12px;font-weight:600;color:var(--gray-700);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;" data-i18n="lbl_pdf_lang">PDF Language:</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <button class="btn-primary" style="justify-content:center;padding:13px 10px;font-size:14px;" onclick="generatePDF('en')">
+            🇺🇸 PDF — English
+          </button>
+          <button class="btn-primary" style="justify-content:center;padding:13px 10px;font-size:14px;background:var(--blue);" onclick="generatePDF('ru')">
+            🇷🇺 PDF — Русский
+          </button>
+        </div>
+      </div>
+      <button class="btn-outline mt-12" style="width:100%;display:flex;justify-content:center;" onclick="clearAll()">
+        🗑️ <span data-i18n="btn_clear_all">Clear All & Start Over</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- STICKY TOTAL BAR -->
+<div class="summary-bar">
+  <div class="summary-total">
+    <div class="summary-label" data-i18n="lbl_est_total">Estimate Total</div>
+    <div class="summary-amount" id="total-display">$0.00</div>
+  </div>
+  <div style="display:flex;gap:6px;">
+    <button class="btn-secondary" onclick="switchTab('summary')" data-i18n="btn_view">View →</button>
+    <button class="btn-primary" onclick="generatePDF('en')" style="font-size:12px;padding:9px 12px;">🇺🇸 PDF</button>
+    <button class="btn-primary" onclick="generatePDF('ru')" style="font-size:12px;padding:9px 12px;background:var(--blue);">🇷🇺 PDF</button>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h2 id="modal-title" data-i18n="modal_clear_title">Clear Estimate?</h2>
+    <p id="modal-body" data-i18n="modal_clear_body">This will remove all selected services and client info. Are you sure?</p>
+    <div class="modal-actions">
+      <button class="btn-outline" onclick="closeModal()" data-i18n="btn_cancel">Cancel</button>
+      <button class="btn-confirm" id="modal-confirm-btn" data-i18n="btn_confirm">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// i18n — BILINGUAL EN / RU
+// ============================================================
+let LANG = 'en';
+
+const TRANSLATIONS = {
+  en: {
+    tab_client:'Client',tab_exterior:'Exterior',tab_interior:'Interior',tab_drywall:'Drywall',tab_handyman:'Handyman',tab_summary:'Summary',
+    sect_estimate_info:'Estimate Info',sect_client_info:'Client Info',sect_pricing:'Pricing Options',sect_notes:'Notes & Terms',sect_summary:'Estimate Summary',sect_pdf_preview:'PDF Invoice Preview',
+    lbl_company:'Company / Your Name',ph_company:'e.g. Pro Painters LLC',
+    lbl_est_num:'Estimate #',lbl_date:'Date',lbl_valid:'Valid Until',lbl_your_phone:'Your Phone',lbl_your_email:'Your Email',lbl_license:'Your License # (if applicable)',
+    lbl_client_name:'Client Name',ph_client_name:'John Smith',lbl_phone:'Phone',lbl_email:'Email',lbl_address:'Property Address',ph_address:'123 Main St, Tampa, FL 33601',
+    lbl_prop_type:'Property Type',lbl_sqft:'Sq. Footage (approx.)',
+    opt_sfh:'Single Family Home',opt_townhouse:'Townhouse',opt_condo:'Condo / Apt',opt_commercial:'Commercial',opt_multifam:'Multi-Family',
+    lbl_discount:'Discount ($)',lbl_deposit:'Deposit Required ($)',lbl_pay_terms:'Payment Terms',
+    opt_pay1:'50% deposit, balance upon completion',opt_pay2:'Payment due upon completion',opt_pay3:'Net 15 days after completion',opt_pay4:'Net 30 days after completion',opt_pay5:'Full payment upfront',opt_pay6:'Weekly billing',
+    lbl_job_notes:'Job Notes',ph_notes:'Describe work scope, special requirements, access info...',lbl_quick_add:'Quick add:',lbl_std_terms:'Standard Terms',
+    note1:'Customer to provide paint color selections',note2:'All furniture to be moved by homeowner before start',note3:'Price includes labor only; materials extra unless noted',note4:'Work to be completed in 1-2 business days',note5:'Includes 1 coat primer + 2 coats finish paint',note6:'Florida-grade exterior paint (heat & UV resistant)',note7:'All prep work included (sanding, caulking, priming)',
+    btn_next_services:'Next: Add Services →',
+    banner_exterior:'ℹ️ Prices reflect Florida market rates (May 2026). Labor + materials included unless noted. Tap a service to set quantity.',
+    banner_interior:'ℹ️ Interior pricing per sq ft. Florida humid climate — mold-resistant paints recommended.',
+    banner_drywall:'ℹ️ Drywall, textures & ceilings. Florida May 2026 rates. Orange peel, knockdown, skip trowel, skim coat and more.',
+    banner_handyman:'ℹ️ Handyman / repair services. Prices per unit or hourly. Labor only unless noted.',
+    lbl_est_total:'Estimate Total',btn_view:'View →',
+    prev_company:'Company:',prev_client:'Client:',prev_address:'Address:',prev_estnum:'Estimate #:',prev_date:'Date:',prev_valid:'Valid Until:',
+    btn_download_pdf:'Download PDF Invoice',btn_clear_all:'Clear All & Start Over',lbl_pdf_lang:'PDF Language:',
+    modal_clear_title:'Clear Estimate?',modal_clear_body:'This will remove all selected services and client info. Are you sure?',
+    btn_cancel:'Cancel',btn_confirm:'Confirm',
+    empty_summary:'No services selected yet. Go to Exterior, Interior, Drywall or Handyman tabs to add services.',
+    lbl_qty:'Qty:',lbl_custom_price:'custom price',lbl_subtotal:'Subtotal',lbl_discount_line:'Discount',lbl_total:'TOTAL',lbl_deposit_req:'Deposit Required',lbl_balance:'Balance Due',
+    std_terms_text:'• Client responsible for selecting paint colors prior to start.\n• Estimate valid for 30 days from date issued.\n• Additional charges may apply for unforeseen conditions (water damage, mold, etc.).\n• Payment per agreed terms above.\n• Contractor maintains general liability insurance.\n• Scope of work does not include drywall repair unless specified.',
+    pdf_alert_empty:'Please select at least one service before generating a PDF.',pdf_loading:'PDF library loading... try again in a moment.',
+  },
+  ru: {
+    tab_client:'Клиент',tab_exterior:'Экстерьер',tab_interior:'Интерьер',tab_drywall:'Шпаклевка',tab_handyman:'Хэндимен',tab_summary:'Итого',
+    sect_estimate_info:'Данные эстимейта',sect_client_info:'Данные клиента',sect_pricing:'Цены и скидки',sect_notes:'Заметки и условия',sect_summary:'Сводка эстимейта',sect_pdf_preview:'PDF инвойс',
+    lbl_company:'Компания / Ваше имя',ph_company:'напр. Pro Painters LLC',
+    lbl_est_num:'Номер эстимейта',lbl_date:'Дата',lbl_valid:'Действует до',lbl_your_phone:'Ваш телефон',lbl_your_email:'Ваш Email',lbl_license:'Номер лицензии (если есть)',
+    lbl_client_name:'Имя клиента',ph_client_name:'Иван Иванов',lbl_phone:'Телефон',lbl_email:'Email',lbl_address:'Адрес объекта',ph_address:'123 Main St, Tampa, FL 33601',
+    lbl_prop_type:'Тип недвижимости',lbl_sqft:'Площадь (прибл. кв. фут)',
+    opt_sfh:'Частный дом (Single Family)',opt_townhouse:'Таунхаус',opt_condo:'Кондо / Квартира',opt_commercial:'Коммерческая',opt_multifam:'Многоквартирный',
+    lbl_discount:'Скидка ($)',lbl_deposit:'Депозит ($)',lbl_pay_terms:'Условия оплаты',
+    opt_pay1:'50% депозит, остаток по завершении',opt_pay2:'Оплата по завершении работ',opt_pay3:'Оплата в течение 15 дней',opt_pay4:'Оплата в течение 30 дней',opt_pay5:'Полная оплата вперёд',opt_pay6:'Еженедельная оплата',
+    lbl_job_notes:'Заметки по работе',ph_notes:'Опишите объём работ, особые требования, доступ...',lbl_quick_add:'Быстро добавить:',lbl_std_terms:'Стандартные условия',
+    note1:'Выбор цвета краски — за клиентом',note2:'Мебель убрать до начала работ — клиент',note3:'Цена включает только работу; материалы — отдельно',note4:'Работы выполняются за 1-2 рабочих дня',note5:'1 слой грунтовки + 2 слоя краски',note6:'Краска для Флориды (термо- и УФ-стойкая)',note7:'Включена полная подготовка (шлифовка, шпаклевка, грунт)',
+    btn_next_services:'Далее: Выбрать услуги →',
+    banner_exterior:'ℹ️ Цены соответствуют рынку Флориды (май 2026). Работа + материалы включены, если не указано иное.',
+    banner_interior:'ℹ️ Цены за кв. фут. Флорида — влажный климат, рекомендуется краска с защитой от плесени.',
+    banner_drywall:'ℹ️ Шпаклевка, текстуры и потолки. Цены Флорида май 2026. Orange peel, knockdown, skip trowel, skim coat и др.',
+    banner_handyman:'ℹ️ Хэндимен / ремонтные работы. Цены за единицу или час. Только работа, если не указано иное.',
+    lbl_est_total:'Итого эстимейт',btn_view:'Итого →',
+    prev_company:'Компания:',prev_client:'Клиент:',prev_address:'Адрес:',prev_estnum:'Эстимейт №:',prev_date:'Дата:',prev_valid:'Действует до:',
+    btn_download_pdf:'Скачать PDF инвойс',btn_clear_all:'Очистить и начать заново',lbl_pdf_lang:'Язык PDF:',
+    modal_clear_title:'Очистить эстимейт?',modal_clear_body:'Все выбранные услуги и данные клиента будут удалены. Вы уверены?',
+    btn_cancel:'Отмена',btn_confirm:'Подтвердить',
+    empty_summary:'Услуги не выбраны. Перейдите на вкладки Экстерьер, Интерьер, Шпаклевка или Хэндимен.',
+    lbl_qty:'Кол-во:',lbl_custom_price:'своя цена',lbl_subtotal:'Подытог',lbl_discount_line:'Скидка',lbl_total:'ИТОГО',lbl_deposit_req:'Депозит',lbl_balance:'Остаток',
+    std_terms_text:'• Клиент обязан выбрать цвета краски до начала работ.\n• Эстимейт действителен 30 дней с даты выдачи.\n• Допрасходы возможны при обнаружении скрытых дефектов (вода, плесень и т.д.).\n• Оплата согласно указанным условиям.\n• Подрядчик застрахован (General Liability).\n• Работы по шпаклевке не включены, если не указано отдельно.',
+    pdf_alert_empty:'Выберите хотя бы одну услугу перед созданием PDF.',pdf_loading:'Библиотека PDF загружается... попробуйте ещё раз.',
+  }
+};
+
+function T(key) { return (TRANSLATIONS[LANG][key] || TRANSLATIONS.en[key] || key); }
+
+function applyLang() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const val = T(key);
+    if (val !== undefined) el.innerHTML = val;
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    const key = el.getAttribute('data-i18n-ph');
+    const val = T(key);
+    if (val) el.placeholder = val;
+  });
+  document.querySelectorAll('select option[data-i18n]').forEach(opt => {
+    const key = opt.getAttribute('data-i18n');
+    opt.textContent = T(key);
+  });
+  const ta = document.getElementById('std_terms');
+  if (ta) {
+    const enT = TRANSLATIONS.en.std_terms_text, ruT = TRANSLATIONS.ru.std_terms_text;
+    if (LANG === 'ru' && (ta.value.trim() === enT.trim() || ta.value.trim() === '')) ta.value = ruT;
+    else if (LANG === 'en' && (ta.value.trim() === ruT.trim() || ta.value.trim() === '')) ta.value = enT;
+  }
+  ['exterior','interior','drywall','handyman'].forEach(cat => renderCategory(cat));
+  recalcTotal();
+}
+
+function toggleLang() {
+  LANG = LANG === 'en' ? 'ru' : 'en';
+  document.getElementById('lang-toggle').textContent = LANG === 'en' ? 'RU' : 'EN';
+  applyLang();
+}
+
+// ============================================================
+// DATA: All services with FL 2026 pricing
+// ============================================================
+const SERVICES = {
+  exterior: [
+    {
+      id: 'ext_house_full',
+      name: 'Full Exterior House Paint',
+      desc: 'Pressure wash, prime, 2 coats exterior paint. Includes walls, trim, soffits. Labor + materials.',
+      unit: 'sq ft (exterior wall area)',
+      price: 2.50,
+      priceLabel: '$2.00–$3.00/sq ft',
+      category: 'Exterior Painting',
+      min: 100,
+      nameRu: 'Покраска дома снаружи (полный комплекс)',
+      descRu: 'Мойка под давлением, грунт, 2 слоя внешней краски. Стены, молдинги, сoffits. Работа + материалы.',
+      unitRu: 'кв. фут (площадь стен)',
+      categoryRu: 'Покраска экстерьера'
+    },
+    {
+      id: 'ext_trim',
+      name: 'Exterior Trim & Fascia Paint',
+      desc: 'Windows, doors, fascia boards, corner trim. Prep, prime, 2 coats.',
+      unit: 'linear ft',
+      price: 4.00,
+      priceLabel: '$3.50–$5.00/ln ft',
+      category: 'Exterior Painting',
+      min: 10,
+      nameRu: 'Покраска молдингов и фасии',
+      descRu: 'Окна, двери, fascia, угловые молдинги. Подготовка, грунт, 2 слоя.',
+      unitRu: 'лин. фут',
+      categoryRu: 'Покраска экстерьера'
+    },
+    {
+      id: 'ext_door',
+      name: 'Exterior Door Paint (per door)',
+      desc: 'Sand, prime, 2 coats high-gloss exterior paint. Includes door frame.',
+      unit: 'door(s)',
+      price: 175,
+      priceLabel: '$150–$200/door',
+      category: 'Exterior Painting',
+      min: 1,
+      nameRu: 'Покраска входной двери (за штуку)',
+      descRu: 'Шлифовка, грунт, 2 слоя глянцевой краски. Включает дверную коробку.',
+      unitRu: 'дверь',
+      categoryRu: 'Покраска экстерьера'
+    },
+    {
+      id: 'ext_garage_door',
+      name: 'Garage Door Paint',
+      desc: 'Degrease, prime, 2 coats exterior paint. Standard 2-car garage door.',
+      unit: 'garage door(s)',
+      price: 275,
+      priceLabel: '$225–$325/door',
+      category: 'Exterior Painting',
+      min: 1,
+      nameRu: 'Покраска гаражных ворот',
+      descRu: 'Обезжиривание, грунт, 2 слоя внешней краски. Стандартные двойные ворота.',
+      unitRu: 'ворота',
+      categoryRu: 'Покраска экстерьера'
+    },
+    {
+      id: 'ext_shutters',
+      name: 'Shutters (per pair)',
+      desc: 'Remove, sand, prime, paint, reinstall. Per pair of shutters.',
+      unit: 'pair(s)',
+      price: 85,
+      priceLabel: '$70–$100/pair',
+      category: 'Exterior Painting',
+      min: 1,
+      nameRu: 'Покраска ставней (за пару)',
+      descRu: 'Снять, шлифовать, грунт, покрасить, вернуть на место.',
+      unitRu: 'пара',
+      categoryRu: 'Покраска экстерьера'
+    },
+    {
+      id: 'ext_fence_wood',
+      name: 'Wood Fence Stain/Paint',
+      desc: 'Power wash, 1 coat stain or paint. Both sides included.',
+      unit: 'linear ft',
+      price: 5.50,
+      priceLabel: '$4.50–$6.50/ln ft',
+      category: 'Exterior Painting',
+      min: 20,
+      nameRu: 'Окраска/пропитка деревянного забора',
+      descRu: 'Мойка, 1 слой морилки или краски. Обе стороны.',
+      unitRu: 'лин. фут',
+      categoryRu: 'Покраска экстерьера'
+    },
+    {
+      id: 'ext_deck_stain',
+      name: 'Deck / Patio Stain or Paint',
+      desc: 'Power wash, sand, 2 coats deck stain/paint. FL-rated water-resistant product.',
+      unit: 'sq ft',
+      price: 3.25,
+      priceLabel: '$2.75–$3.75/sq ft',
+      category: 'Exterior Painting',
+      min: 50,
+      nameRu: 'Покраска/пропитка террасы / патио',
+      descRu: 'Мойка, шлифовка, 2 слоя краски/морилки для декинга.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Покраска экстерьера'
+    },
+    {
+      id: 'ext_pressure_wash',
+      name: 'Pressure Washing Only',
+      desc: 'Professional pressure wash of exterior, driveway, sidewalks. No paint included.',
+      unit: 'sq ft (total area)',
+      price: 0.30,
+      priceLabel: '$0.20–$0.40/sq ft',
+      category: 'Prep & Cleaning',
+      min: 500,
+      nameRu: 'Мойка под давлением (только)',
+      descRu: 'Профессиональная мойка экстерьера, дорожки, тротуары. Без краски.',
+      unitRu: 'кв. фут (общая площадь)',
+      categoryRu: 'Подготовка и уборка'
+    },
+    {
+      id: 'ext_caulk',
+      name: 'Exterior Caulking / Sealing',
+      desc: 'Remove old caulk, apply paintable caulk around windows, doors, trim.',
+      unit: 'linear ft',
+      price: 2.50,
+      priceLabel: '$2.00–$3.00/ln ft',
+      category: 'Prep & Cleaning',
+      min: 10,
+      nameRu: 'Герметизация / Конопатка снаружи',
+      descRu: 'Удалить старый герметик, нанести новый вокруг окон, дверей, молдингов.',
+      unitRu: 'лин. фут',
+      categoryRu: 'Подготовка и уборка'
+    },
+    {
+      id: 'ext_soffit_fascia',
+      name: 'Soffit & Fascia Paint',
+      desc: 'Clean, prime if needed, 2 coats exterior paint on soffits and fascia boards.',
+      unit: 'linear ft',
+      price: 5.00,
+      priceLabel: '$4.00–$6.00/ln ft',
+      category: 'Exterior Painting',
+      min: 20,
+      nameRu: 'Покраска sottit и фасии',
+      descRu: 'Очистка, грунт при необходимости, 2 слоя краски.',
+      unitRu: 'лин. фут',
+      categoryRu: 'Покраска экстерьера'
+    },
+    {
+      id: 'ext_block_seal',
+      name: 'Concrete Block / Stucco Seal & Paint',
+      desc: 'Masonry sealer + 2 coats elastomeric paint. Waterproofing included.',
+      unit: 'sq ft',
+      price: 3.00,
+      priceLabel: '$2.50–$3.50/sq ft',
+      category: 'Exterior Painting',
+      min: 100,
+      nameRu: 'Герметизация и покраска блока / штукатурки',
+      descRu: 'Каменный герметик + 2 слоя эластомерной краски. Гидроизоляция.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Покраска экстерьера'
+    },
+    {
+      id: 'ext_pool_deck',
+      name: 'Pool Deck Paint / Kool Deck Coat',
+      desc: 'Pool deck paint or cool deck coating. Non-slip, UV-resistant.',
+      unit: 'sq ft',
+      price: 4.00,
+      priceLabel: '$3.00–$5.00/sq ft',
+      category: 'Exterior Painting',
+      min: 50,
+      nameRu: 'Покраска террасы у бассейна / Kool Deck',
+      descRu: 'Покрытие для бассейна — нескользящее, УФ-стойкое.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Покраска экстерьера'
+    },
+  ],
+  interior: [
+    {
+      id: 'int_room_full',
+      name: 'Full Room Paint — Walls + Ceiling',
+      desc: 'Prep (patch, tape, protect), 1 coat primer if needed, 2 coats paint on walls and ceiling. Per sq ft of total wall+ceiling area.',
+      unit: 'sq ft',
+      price: 1.65,
+      priceLabel: '$1.35–$1.95/sq ft',
+      category: 'Interior Painting',
+      min: 50,
+      nameRu: 'Покраска комнаты полностью (стены + потолок)',
+      descRu: 'Подготовка, грунт при необходимости, 2 слоя краски на стенах и потолке.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Покраска интерьера'
+    },
+    {
+      id: 'int_walls_only',
+      name: 'Walls Only Paint',
+      desc: 'Tape off ceiling and trim, 2 coats paint on walls only. Per sq ft of wall area.',
+      unit: 'sq ft (walls)',
+      price: 1.25,
+      priceLabel: '$1.00–$1.50/sq ft',
+      category: 'Interior Painting',
+      min: 50,
+      nameRu: 'Только стены',
+      descRu: 'Маскировка потолка и молдингов, 2 слоя краски на стенах.',
+      unitRu: 'кв. фут (стены)',
+      categoryRu: 'Покраска интерьера'
+    },
+    {
+      id: 'int_ceiling',
+      name: 'Ceiling Paint Only',
+      desc: 'Flat ceiling paint, 1-2 coats. Smooth or existing textured ceiling. Price per sq ft of ceiling area.',
+      unit: 'sq ft (ceiling)',
+      price: 1.10,
+      priceLabel: '$0.85–$1.35/sq ft',
+      category: 'Interior Painting',
+      min: 50,
+      nameRu: 'Только потолок',
+      descRu: 'Матовая потолочная краска, 1-2 слоя. Цена за кв. фут потолка.',
+      unitRu: 'кв. фут (потолок)',
+      categoryRu: 'Покраска интерьера'
+    },
+    {
+      id: 'int_interior_door',
+      name: 'Interior Door Paint (per door)',
+      desc: 'Sand, prime, 2 coats semi-gloss. Includes door frame and casing.',
+      unit: 'door(s)',
+      price: 110,
+      priceLabel: '$90–$130/door',
+      category: 'Interior Painting',
+      min: 1,
+      nameRu: 'Покраска внутренней двери (за штуку)',
+      descRu: 'Шлифовка, грунт, 2 слоя полуглянцевой краски. Коробка включена.',
+      unitRu: 'дверь',
+      categoryRu: 'Покраска интерьера'
+    },
+    {
+      id: 'int_trim',
+      name: 'Interior Trim & Baseboards',
+      desc: 'Sand, caulk, prime, 2 coats semi-gloss. Per linear foot.',
+      unit: 'linear ft',
+      price: 3.50,
+      priceLabel: '$3.00–$4.00/ln ft',
+      category: 'Interior Painting',
+      min: 10,
+      nameRu: 'Молдинги и плинтуса внутри',
+      descRu: 'Шлифовка, конопатка, грунт, 2 слоя полуглянца.',
+      unitRu: 'лин. фут',
+      categoryRu: 'Покраска интерьера'
+    },
+    {
+      id: 'int_cabinet_repaint',
+      name: 'Cabinet Repainting (per door face)',
+      desc: 'Sand, degloss, prime, 2 coats cabinet-grade enamel. Per door face. Box painting extra.',
+      unit: 'cabinet door(s)',
+      price: 85,
+      priceLabel: '$70–$100/door',
+      category: 'Interior Painting',
+      min: 2,
+      nameRu: 'Перекраска фасадов шкафчиков (за дверцу)',
+      descRu: 'Шлифовка, обезжиривание, грунт, 2 слоя эмали. За одну дверцу.',
+      unitRu: 'дверца',
+      categoryRu: 'Покраска интерьера'
+    },
+    {
+      id: 'int_accent_wall',
+      name: 'Accent Wall',
+      desc: 'Single feature wall, 2 coats, different color from room. Per sq ft of that wall surface.',
+      unit: 'sq ft (wall)',
+      price: 1.50,
+      priceLabel: '$1.20–$1.80/sq ft',
+      category: 'Interior Painting',
+      min: 20,
+      nameRu: 'Акцентная стена',
+      descRu: 'Одна стена, 2 слоя, другой цвет. Цена за кв. фут стены.',
+      unitRu: 'кв. фут (стена)',
+      categoryRu: 'Покраска интерьера'
+    },
+    {
+      id: 'int_prime_only',
+      name: 'Primer Only Application',
+      desc: 'Stain-blocking or sealing primer on walls/ceiling. New drywall, heavy stains, smoke damage. Per sq ft.',
+      unit: 'sq ft',
+      price: 0.65,
+      priceLabel: '$0.50–$0.80/sq ft',
+      category: 'Interior Painting',
+      min: 50,
+      nameRu: 'Только грунтовка',
+      descRu: 'Грунт-блокатор пятен на стены/потолок. Новый drywall или сильные пятна.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Покраска интерьера'
+    },
+    {
+      id: 'int_epoxy_floor',
+      name: 'Garage / Concrete Floor Epoxy',
+      desc: 'Acid etch, 2-part epoxy coat. Flake broadcast optional. Garage up to 2-car.',
+      unit: 'sq ft',
+      price: 5.50,
+      priceLabel: '$4.50–$6.50/sq ft',
+      category: 'Floor Coatings',
+      min: 100,
+      nameRu: 'Эпоксидный пол гаража / бетон',
+      descRu: 'Кислотное травление, 2-компонентный эпоксид. Возможны чипсы.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Напольные покрытия'
+    },
+    {
+      id: 'int_whole_house',
+      name: 'Whole House Interior Paint',
+      desc: 'All walls, ceilings, doors, trim in home. Price per sq ft of living area. Excludes cabinets.',
+      unit: 'sq ft (living area)',
+      price: 2.75,
+      priceLabel: '$2.25–$3.25/sq ft',
+      category: 'Interior Painting',
+      min: 500,
+      nameRu: 'Покраска всего дома внутри',
+      descRu: 'Все стены, потолки, двери, молдинги. Цена за кв. фут жилой площади.',
+      unitRu: 'кв. фут (жил. площадь)',
+      categoryRu: 'Покраска интерьера'
+    },
+  ],
+  drywall: [
+    // ---- POPCORN CEILING ----
+    {
+      id: 'pop_remove_only',
+      name: 'Popcorn Ceiling — Remove Only (no paint)',
+      desc: 'Wet scrape existing popcorn texture off ceiling. Surface left raw/unfinished. Asbestos test recommended for pre-1980 homes (not included).',
+      unit: 'sq ft',
+      price: 1.75,
+      priceLabel: '$1.50–$2.00/sq ft',
+      category: 'Popcorn Ceiling',
+      min: 50,
+      nameRu: 'Снятие попкорна (только)',
+      descRu: 'Мокрое скобление попкорн-текстуры с потолка. Поверхность без отделки. Рекомендуется тест на асбест для домов до 1980 г.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Попкорн потолок'
+    },
+    {
+      id: 'pop_remove_paint',
+      name: 'Popcorn Removal + Paint (smooth finish)',
+      desc: 'Scrape popcorn, light skim coat if needed, sand, prime, 2 coats ceiling paint. Smooth finish.',
+      unit: 'sq ft',
+      price: 3.50,
+      priceLabel: '$3.00–$4.00/sq ft',
+      category: 'Popcorn Ceiling',
+      min: 50,
+      nameRu: 'Снятие попкорна + покраска (гладкий)',
+      descRu: 'Скобление, лёгкий skim coat при необходимости, грунт, 2 слоя краски.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Попкорн потолок'
+    },
+    {
+      id: 'pop_remove_skim_texture',
+      name: 'Popcorn Removal + Skim Coat + New Texture + Paint',
+      desc: 'Full process: scrape, full skim coat (Level 4–5 finish), apply new texture of choice, prime, 2 coats paint.',
+      unit: 'sq ft',
+      price: 5.50,
+      priceLabel: '$4.50–$6.50/sq ft',
+      category: 'Popcorn Ceiling',
+      min: 50,
+      nameRu: 'Снятие + skim coat + новая текстура + покраска',
+      descRu: 'Полный процесс: скобление, полный skim coat (Level 4–5), новая текстура, грунт, 2 слоя краски.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Попкорн потолок'
+    },
+    {
+      id: 'pop_paint_over',
+      name: 'Paint Over Existing Popcorn (no removal)',
+      desc: 'Spray or roll paint directly on existing popcorn ceiling. No removal. 2 coats.',
+      unit: 'sq ft',
+      price: 1.20,
+      priceLabel: '$0.90–$1.50/sq ft',
+      category: 'Popcorn Ceiling',
+      min: 50,
+      nameRu: 'Покраска поверх попкорна (без снятия)',
+      descRu: 'Нанесение краски прямо на существующий попкорн. 2 слоя.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Попкорн потолок'
+    },
+    {
+      id: 'pop_apply_new',
+      name: 'Apply New Popcorn / Acoustic Texture',
+      desc: 'Spray new acoustic (popcorn) texture on ceiling. Matches existing or new application.',
+      unit: 'sq ft',
+      price: 1.35,
+      priceLabel: '$1.10–$1.60/sq ft',
+      category: 'Popcorn Ceiling',
+      min: 50,
+      nameRu: 'Нанесение нового попкорна / акустики',
+      descRu: 'Напыление новой акустической (попкорн) текстуры на потолок.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Попкорн потолок'
+    },
+    // ---- DRYWALL / ШПАКЛЕВКА ----
+    {
+      id: 'dw_patch_sm',
+      name: 'Drywall Patch — Small (up to 4")',
+      desc: 'Patch nail holes, small cracks, minor damage. Sand, texture match, prime. Ready to paint. Per location.',
+      unit: 'patch(es)',
+      price: 75,
+      priceLabel: '$60–$90/patch',
+      category: 'Drywall & Шпаклевка',
+      min: 1,
+      nameRu: 'Патч drywall — маленький (до 4")',
+      descRu: 'Залатать гвоздевые дырки, мелкие трещины. Шлифовка, совмещение текстуры, грунт.',
+      unitRu: 'патч',
+      categoryRu: 'Шпаклевка и Drywall'
+    },
+    {
+      id: 'dw_patch_md',
+      name: 'Drywall Patch — Medium (4"–12")',
+      desc: 'Cut out damaged area, backer board, new drywall, tape, joint compound (mud), sand, texture match, prime.',
+      unit: 'patch(es)',
+      price: 175,
+      priceLabel: '$150–$200/patch',
+      category: 'Drywall & Шпаклевка',
+      min: 1,
+      nameRu: 'Патч drywall — средний (4"–12")',
+      descRu: 'Вырезка, подпорная доска, новый drywall, серпянка, шпаклевка, шлифовка, текстура, грунт.',
+      unitRu: 'патч',
+      categoryRu: 'Шпаклевка и Drywall'
+    },
+    {
+      id: 'dw_patch_lg',
+      name: 'Drywall Patch — Large (12"–24")',
+      desc: 'Full cut-out, new drywall panel section, tape, 3 coats joint compound, sand, texture, prime.',
+      unit: 'patch(es)',
+      price: 295,
+      priceLabel: '$250–$350/patch',
+      category: 'Drywall & Шпаклевка',
+      min: 1,
+      nameRu: 'Патч drywall — большой (12"–24")',
+      descRu: 'Полная вырезка, новый лист drywall, серпянка, 3 слоя шпаклевки, шлифовка, текстура, грунт.',
+      unitRu: 'патч',
+      categoryRu: 'Шпаклевка и Drywall'
+    },
+    {
+      id: 'dw_tape_mud',
+      name: 'Tape & Mud — New Drywall (Level 3 finish)',
+      desc: 'Tape seams, 3 coats joint compound, sand smooth. Standard Level 3 — suitable for texture or flat paint.',
+      unit: 'sq ft',
+      price: 1.50,
+      priceLabel: '$1.25–$1.75/sq ft',
+      category: 'Drywall & Шпаклевка',
+      min: 100,
+      nameRu: 'Серпянка + шпаклевка (Level 3)',
+      descRu: 'Серпянка на стыки, 3 слоя шпаклевки, шлифовка. Стандарт Level 3.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Шпаклевка и Drywall'
+    },
+    {
+      id: 'dw_level4',
+      name: 'Drywall Finish — Level 4 (skim over tape)',
+      desc: 'All joints, angles, fasteners coated twice. Skim coat applied. Suitable for flat or eggshell paint.',
+      unit: 'sq ft',
+      price: 2.00,
+      priceLabel: '$1.75–$2.25/sq ft',
+      category: 'Drywall & Шпаклевка',
+      min: 100,
+      nameRu: 'Отделка drywall Level 4',
+      descRu: 'Все стыки и крепёж зашпаклеваны дважды. Skim coat. Под матовую или яичную краску.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Шпаклевка и Drywall'
+    },
+    {
+      id: 'dw_level5',
+      name: 'Drywall Finish — Level 5 (full skim coat)',
+      desc: 'Full skim coat over entire surface. Highest quality finish. Required for gloss/semi-gloss paint or critical lighting. Looks perfect.',
+      unit: 'sq ft',
+      price: 2.75,
+      priceLabel: '$2.25–$3.25/sq ft',
+      category: 'Drywall & Шпаклевка',
+      min: 100,
+      nameRu: 'Отделка drywall Level 5 (полный skim coat)',
+      descRu: 'Полный skim coat на всю поверхность. Высшее качество. Под глянцевую краску или критическое освещение.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Шпаклевка и Drywall'
+    },
+    {
+      id: 'dw_skim_walls',
+      name: 'Skim Coat — Walls',
+      desc: 'Apply thin skim coat of joint compound over existing walls. Covers old texture, hairline cracks, imperfections. Sand, prime ready. Per sq ft of wall area.',
+      unit: 'sq ft (walls)',
+      price: 2.25,
+      priceLabel: '$1.75–$2.75/sq ft',
+      category: 'Drywall & Шпаклевка',
+      min: 50,
+      nameRu: 'Skim coat — стены',
+      descRu: 'Тонкий слой шпаклевки на существующие стены. Скрывает текстуру, трещины. Под шлифовку и грунт.',
+      unitRu: 'кв. фут (стены)',
+      categoryRu: 'Шпаклевка и Drywall'
+    },
+    {
+      id: 'dw_skim_ceiling',
+      name: 'Skim Coat — Ceiling',
+      desc: 'Full skim coat of joint compound on ceiling. Sand to Level 5. After popcorn removal or for smooth ceiling finish. Per sq ft of ceiling area.',
+      unit: 'sq ft (ceiling)',
+      price: 2.50,
+      priceLabel: '$2.00–$3.00/sq ft',
+      category: 'Drywall & Шпаклевка',
+      min: 50,
+      nameRu: 'Skim coat — потолок',
+      descRu: 'Полный skim coat шпаклевки на потолок. Шлифовка до Level 5. После снятия попкорна или для гладкого потолка.',
+      unitRu: 'кв. фут (потолок)',
+      categoryRu: 'Шпаклевка и Drywall'
+    },
+    {
+      id: 'dw_crack_repair',
+      name: 'Hairline Crack Repair (tape & compound)',
+      desc: 'V-out crack, fiberglass mesh tape, joint compound, sand, prime. Settlement cracks, stress cracks in walls/ceilings.',
+      unit: 'linear ft',
+      price: 8.00,
+      priceLabel: '$6.00–$10.00/ln ft',
+      category: 'Drywall & Шпаклевка',
+      min: 2,
+      nameRu: 'Ремонт трещин (серпянка + шпаклевка)',
+      descRu: 'Расшивка трещины, серпянка, шпаклевка, шлифовка, грунт. Усадочные трещины.',
+      unitRu: 'лин. фут',
+      categoryRu: 'Шпаклевка и Drywall'
+    },
+    {
+      id: 'dw_water_damage',
+      name: 'Water Damage Drywall Repair',
+      desc: 'Remove damaged drywall, treat/prime with stain blocker (Kilz), new drywall, tape, mud, texture, prime. Paint extra.',
+      unit: 'sq ft',
+      price: 12.00,
+      priceLabel: '$9.00–$15.00/sq ft',
+      category: 'Drywall & Шпаклевка',
+      min: 4,
+      nameRu: 'Ремонт drywall после затопления',
+      descRu: 'Удалить повреждённый drywall, обработать блокатором (Kilz), новый drywall, шпаклевка, текстура, грунт.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Шпаклевка и Drywall'
+    },
+    {
+      id: 'dw_corner_bead',
+      name: 'Corner Bead Repair / Install',
+      desc: 'Metal or vinyl corner bead on outside corners. Compound, sand, prime. Per linear foot.',
+      unit: 'linear ft',
+      price: 6.00,
+      priceLabel: '$5.00–$7.00/ln ft',
+      category: 'Drywall & Шпаклевка',
+      min: 2,
+      nameRu: 'Угловой профиль (corner bead) — установка',
+      descRu: 'Металлический или виниловый профиль на внешние углы. Шпаклевка, шлифовка, грунт.',
+      unitRu: 'лин. фут',
+      categoryRu: 'Шпаклевка и Drywall'
+    },
+    {
+      id: 'dw_new_install',
+      name: 'New Drywall Installation (hang only)',
+      desc: 'Hang 1/2" drywall on existing framing. Screw, tape butt joints. Does NOT include finishing/mud. Per sq ft.',
+      unit: 'sq ft',
+      price: 2.25,
+      priceLabel: '$1.75–$2.75/sq ft',
+      category: 'Drywall & Шпаклевка',
+      min: 50,
+      nameRu: 'Монтаж нового drywall (только навес)',
+      descRu: 'Навес листов 1/2" на существующий каркас. Без шпаклевки.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Шпаклевка и Drywall'
+    },
+    // ---- TEXTURE ----
+    {
+      id: 'tex_orange_peel',
+      name: 'Orange Peel Texture',
+      desc: 'Spray applied orange peel texture. Light, medium or heavy splatter. Most common Florida finish. Walls or ceilings.',
+      unit: 'sq ft',
+      price: 1.40,
+      priceLabel: '$1.10–$1.70/sq ft',
+      category: 'Texture',
+      min: 50,
+      nameRu: 'Текстура Orange Peel (апельсиновая корка)',
+      descRu: 'Напыление текстуры orange peel. Лёгкая, средняя или тяжёлая. Самая распространённая во Флориде.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Текстура'
+    },
+    {
+      id: 'tex_knockdown',
+      name: 'Knockdown Texture (Кноксдайн)',
+      desc: 'Spray joint compound, partially flatten with trowel/knife creating "skip trowel" knockdown pattern. Very popular in Florida homes.',
+      unit: 'sq ft',
+      price: 1.60,
+      priceLabel: '$1.25–$1.90/sq ft',
+      category: 'Texture',
+      min: 50,
+      nameRu: 'Текстура Knockdown (кноксдайн)',
+      descRu: 'Напыление шпаклевки + частичное разглаживание шпателем. Очень популярно во Флориде.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Текстура'
+    },
+    {
+      id: 'tex_skip_trowel',
+      name: 'Skip Trowel / Hawk & Trowel Texture',
+      desc: 'Hand-applied skip trowel texture. Artisan finish, irregular Spanish-style plaster look. Labor intensive — premium finish.',
+      unit: 'sq ft',
+      price: 2.50,
+      priceLabel: '$2.00–$3.00/sq ft',
+      category: 'Texture',
+      min: 50,
+      nameRu: 'Skip Trowel / Hawk & Trowel (ручная текстура)',
+      descRu: 'Ручное нанесение skip trowel. Испанский стиль, нерегулярный рисунок. Премиум отделка.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Текстура'
+    },
+    {
+      id: 'tex_smooth',
+      name: 'Smooth Wall Finish (no texture)',
+      desc: 'Sand and skim to perfectly smooth Level 5 — no texture applied. For modern/contemporary look. Critical lighting approved.',
+      unit: 'sq ft',
+      price: 2.25,
+      priceLabel: '$1.75–$2.75/sq ft',
+      category: 'Texture',
+      min: 50,
+      nameRu: 'Гладкая стена (без текстуры)',
+      descRu: 'Шлифовка и skim до идеально гладкого Level 5. Современный стиль.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Текстура'
+    },
+    {
+      id: 'tex_sand',
+      name: 'Sand Texture (fine/medium)',
+      desc: 'Fine sand aggregate mixed into paint or primer, rolled on. Subtle texture, hides imperfections well. Ceilings and walls.',
+      unit: 'sq ft',
+      price: 1.20,
+      priceLabel: '$0.90–$1.50/sq ft',
+      category: 'Texture',
+      min: 50,
+      nameRu: 'Песчаная текстура (мелкая/средняя)',
+      descRu: 'Мелкий песчаный наполнитель в краске или грунте, накатывается валиком.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Текстура'
+    },
+    {
+      id: 'tex_stomp',
+      name: 'Stomp / Crow\'s Foot Texture',
+      desc: 'Rolled joint compound stomped with brush for random pattern. Common in older FL homes. Ceiling and walls.',
+      unit: 'sq ft',
+      price: 1.50,
+      priceLabel: '$1.20–$1.80/sq ft',
+      category: 'Texture',
+      min: 50,
+      nameRu: "Stomping / Crow's Foot (штамп)",
+      descRu: 'Нанесение шпаклевки валиком + штамповка кистью. Часто в старых домах Флориды.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Текстура'
+    },
+    {
+      id: 'tex_slap_brush',
+      name: 'Slap Brush / Rosebud Texture',
+      desc: 'Applied with brush slapping into wet compound creating swirled/rosebud pattern. Decorative ceiling accent texture.',
+      unit: 'sq ft',
+      price: 1.65,
+      priceLabel: '$1.35–$2.00/sq ft',
+      category: 'Texture',
+      min: 50,
+      nameRu: 'Slap Brush / Розетка (кисть)',
+      descRu: 'Нанесение кистью в сырую шпаклевку — завитки/розетки. Декоративная потолочная текстура.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Текстура'
+    },
+    {
+      id: 'tex_santa_fe',
+      name: 'Santa Fe / Venetian Plaster Style',
+      desc: 'Trowel-applied smooth compound with slight variations. Upscale finish. Multiple coats, burnished.',
+      unit: 'sq ft',
+      price: 4.50,
+      priceLabel: '$3.50–$5.50/sq ft',
+      category: 'Texture',
+      min: 50,
+      nameRu: 'Santa Fe / Венецианская штукатурка',
+      descRu: 'Нанесение шпателем с вариациями. Премиум отделка. Несколько слоёв + полировка.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Текстура'
+    },
+    {
+      id: 'tex_match',
+      name: 'Texture Match (blend repair into existing)',
+      desc: 'Match existing wall/ceiling texture after a repair. Blend new texture into surrounding area. Per patch/area.',
+      unit: 'patch(es)',
+      price: 65,
+      priceLabel: '$50–$80/patch',
+      category: 'Texture',
+      min: 1,
+      nameRu: 'Совмещение текстуры (подгонка после ремонта)',
+      descRu: 'Подогнать существующую текстуру стены/потолка после ремонтного патча.',
+      unitRu: 'патч',
+      categoryRu: 'Текстура'
+    },
+    {
+      id: 'tex_remove_wall',
+      name: 'Texture Removal — Walls (skim over)',
+      desc: 'Skim coat over existing wall texture to achieve smooth finish. Sand, prime. Per sq ft.',
+      unit: 'sq ft',
+      price: 2.00,
+      priceLabel: '$1.75–$2.25/sq ft',
+      category: 'Texture',
+      min: 50,
+      nameRu: 'Снятие текстуры со стен (skim over)',
+      descRu: 'Skim coat поверх существующей текстуры стен для получения гладкой поверхности.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Текстура'
+    },
+  ],
+  handyman: [
+    {
+      id: 'hm_hourly',
+      name: 'General Handyman Labor (hourly)',
+      desc: 'General repairs, misc tasks, light carpentry. Florida market rate.',
+      unit: 'hour(s)',
+      price: 90,
+      priceLabel: '$75–$110/hr',
+      category: 'General Labor',
+      min: 1,
+      nameRu: 'Хэндимен — почасовая работа',
+      descRu: 'Общий ремонт, мелкие задачи, лёгкое плотничество. Ставка Флориды.',
+      unitRu: 'час',
+      categoryRu: 'Общие работы'
+    },
+    {
+      id: 'hm_caulk_bath',
+      name: 'Bathroom Caulk & Grout Repair',
+      desc: 'Remove old caulk, clean, apply new silicone caulk around tub/shower/sinks.',
+      unit: 'bathroom(s)',
+      price: 175,
+      priceLabel: '$150–$200/bath',
+      category: 'Bathroom',
+      min: 1,
+      nameRu: 'Герметизация ванной / душа',
+      descRu: 'Удаление старого герметика, очистка, новый силиконовый герметик вокруг ванны/душа/раковины.',
+      unitRu: 'ванная',
+      categoryRu: 'Ванная'
+    },
+    {
+      id: 'hm_drywall_repair',
+      name: 'Drywall Repair (small holes)',
+      desc: 'Patch holes up to 4" diameter. Sand, texture, prime. Paint matching extra.',
+      unit: 'repair(s)',
+      price: 95,
+      priceLabel: '$75–$115/repair',
+      category: 'Drywall',
+      min: 1,
+      nameRu: 'Ремонт drywall (маленькие дырки)',
+      descRu: 'Заделка дырок до 4". Шлифовка, текстура, грунт. Покраска — отдельно.',
+      unitRu: 'ремонт',
+      categoryRu: 'Drywall'
+    },
+    {
+      id: 'hm_drywall_lg',
+      name: 'Drywall Repair (large 4"–12")',
+      desc: 'Cut out, backer board, new drywall, tape, mud, sand, texture. Ready to paint.',
+      unit: 'repair(s)',
+      price: 220,
+      priceLabel: '$185–$265/repair',
+      category: 'Drywall',
+      min: 1,
+      nameRu: 'Ремонт drywall (большой 4"–12")',
+      descRu: 'Вырезка, подпорная доска, новый drywall, серпянка, шпаклевка, текстура.',
+      unitRu: 'ремонт',
+      categoryRu: 'Drywall'
+    },
+    {
+      id: 'hm_door_hang',
+      name: 'Door Installation / Hanging',
+      desc: 'Install pre-hung interior door, includes hardware. Framing adjustments extra.',
+      unit: 'door(s)',
+      price: 250,
+      priceLabel: '$200–$300/door',
+      category: 'Doors & Windows',
+      min: 1,
+      nameRu: 'Установка двери',
+      descRu: 'Монтаж pre-hung внутренней двери, включает фурнитуру.',
+      unitRu: 'дверь',
+      categoryRu: 'Двери и окна'
+    },
+    {
+      id: 'hm_door_repair',
+      name: 'Door Repair (sagging, sticking)',
+      desc: 'Plane, adjust hinges, fix latch. Minor door repairs.',
+      unit: 'door(s)',
+      price: 95,
+      priceLabel: '$75–$115/door',
+      category: 'Doors & Windows',
+      min: 1,
+      nameRu: 'Ремонт двери (провисание, заедание)',
+      descRu: 'Рубанок, регулировка петель, защёлка. Мелкий ремонт.',
+      unitRu: 'дверь',
+      categoryRu: 'Двери и окна'
+    },
+    {
+      id: 'hm_baseboard',
+      name: 'Baseboard / Trim Installation',
+      desc: 'Install new baseboard trim, nail and caulk. Paint not included.',
+      unit: 'linear ft',
+      price: 5.50,
+      priceLabel: '$4.50–$6.50/ln ft',
+      category: 'Carpentry',
+      min: 10,
+      nameRu: 'Установка плинтуса / молдинга',
+      descRu: 'Монтаж нового плинтуса, прибить и законопатить. Без покраски.',
+      unitRu: 'лин. фут',
+      categoryRu: 'Плотничество'
+    },
+    {
+      id: 'hm_crown',
+      name: 'Crown Molding Installation',
+      desc: 'Install crown molding, cope corners, caulk. Paint not included.',
+      unit: 'linear ft',
+      price: 9.00,
+      priceLabel: '$7.00–$11.00/ln ft',
+      category: 'Carpentry',
+      min: 10,
+      nameRu: 'Установка потолочного молдинга (crown)',
+      descRu: 'Установка crown molding, совмещение углов, заделка. Без покраски.',
+      unitRu: 'лин. фут',
+      categoryRu: 'Плотничество'
+    },
+    {
+      id: 'hm_pressure_wash',
+      name: 'Pressure Washing (driveway/sidewalk)',
+      desc: 'Concrete driveway, walkways, patio surfaces. No house washing.',
+      unit: 'sq ft',
+      price: 0.25,
+      priceLabel: '$0.20–$0.30/sq ft',
+      category: 'Cleaning',
+      min: 200,
+      nameRu: 'Мойка подъездной дорожки / тротуара',
+      descRu: 'Бетонная дорожка, тротуары, патио. Без мойки дома.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Уборка'
+    },
+    {
+      id: 'hm_gutter_clean',
+      name: 'Gutter Cleaning',
+      desc: 'Remove debris, flush downspouts, check for damage. Up to 200 ln ft.',
+      unit: 'linear ft',
+      price: 1.75,
+      priceLabel: '$1.50–$2.00/ln ft',
+      category: 'Cleaning',
+      min: 20,
+      nameRu: 'Чистка водостоков',
+      descRu: 'Удаление мусора, прочистка труб. До 200 лин. фут.',
+      unitRu: 'лин. фут',
+      categoryRu: 'Уборка'
+    },
+    {
+      id: 'hm_caulk_window',
+      name: 'Window Caulking / Weatherstripping',
+      desc: 'Remove old caulk, apply new exterior caulk around window frames.',
+      unit: 'window(s)',
+      price: 55,
+      priceLabel: '$45–$65/window',
+      category: 'Doors & Windows',
+      min: 1,
+      nameRu: 'Герметизация окон / уплотнители',
+      descRu: 'Удалить старый герметик, нанести новый снаружи вокруг рам окон.',
+      unitRu: 'окно',
+      categoryRu: 'Двери и окна'
+    },
+    {
+      id: 'hm_tile_grout',
+      name: 'Tile Grout Cleaning & Sealing',
+      desc: 'Clean grout lines, apply grout sealer. Per sq ft.',
+      unit: 'sq ft',
+      price: 3.00,
+      priceLabel: '$2.50–$3.50/sq ft',
+      category: 'Tile & Flooring',
+      min: 20,
+      nameRu: 'Чистка и герметизация затирки плитки',
+      descRu: 'Очистка затирки, нанесение герметика. За кв. фут.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Плитка и полы'
+    },
+    {
+      id: 'hm_light_fixture',
+      name: 'Light Fixture Replacement',
+      desc: 'Remove old, install new ceiling light/fan (customer supplies fixture).',
+      unit: 'fixture(s)',
+      price: 85,
+      priceLabel: '$75–$100/fixture',
+      category: 'Electrical (minor)',
+      min: 1,
+      nameRu: 'Замена светильника',
+      descRu: 'Снять старый, установить новый потолочный светильник/вентилятор (светильник — от клиента).',
+      unitRu: 'светильник',
+      categoryRu: 'Электрика (мелкая)'
+    },
+    {
+      id: 'hm_smoke_detector',
+      name: 'Smoke/CO Detector Install',
+      desc: 'Install and test smoke or CO detector. Battery or hardwired.',
+      unit: 'detector(s)',
+      price: 45,
+      priceLabel: '$35–$55/unit',
+      category: 'Safety',
+      min: 1,
+      nameRu: 'Установка датчика дыма/CO',
+      descRu: 'Монтаж и проверка датчика дыма или угарного газа.',
+      unitRu: 'датчик',
+      categoryRu: 'Безопасность'
+    },
+    {
+      id: 'hm_tv_mount',
+      name: 'TV Wall Mount Installation',
+      desc: 'Mount TV to wall (bracket supplied by customer), conceal cables behind wall.',
+      unit: 'TV(s)',
+      price: 150,
+      priceLabel: '$125–$175/TV',
+      category: 'General Labor',
+      min: 1,
+      nameRu: 'Монтаж телевизора на стену',
+      descRu: 'Крепление TV на стену (кронштейн — клиент), скрытие проводов.',
+      unitRu: 'TV',
+      categoryRu: 'Общие работы'
+    },
+    {
+      id: 'hm_fence_repair',
+      name: 'Wood Fence Panel Repair',
+      desc: 'Replace damaged fence boards/pickets, secure posts. Per panel (8 ft section).',
+      unit: 'panel(s)',
+      price: 185,
+      priceLabel: '$150–$220/panel',
+      category: 'Fencing',
+      min: 1,
+      nameRu: 'Ремонт панели деревянного забора',
+      descRu: 'Замена повреждённых досок, крепление столбов. За панель (секция 8 фут).',
+      unitRu: 'панель',
+      categoryRu: 'Забор'
+    },
+    {
+      id: 'hm_deck_repair',
+      name: 'Deck Board Replacement',
+      desc: 'Replace rotted/damaged deck boards. Material + labor per sq ft.',
+      unit: 'sq ft',
+      price: 18,
+      priceLabel: '$14–$22/sq ft',
+      category: 'Carpentry',
+      min: 10,
+      nameRu: 'Замена досок террасы',
+      descRu: 'Замена гнилых/повреждённых досок декинга. Материал + работа за кв. фут.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Плотничество'
+    },
+    {
+      id: 'hm_insulation',
+      name: 'Attic Insulation (blown-in)',
+      desc: 'Add blown-in insulation to attic, R-30 level. Florida heat efficiency.',
+      unit: 'sq ft',
+      price: 1.80,
+      priceLabel: '$1.50–$2.10/sq ft',
+      category: 'Insulation',
+      min: 200,
+      nameRu: 'Утепление чердака (задувная изоляция)',
+      descRu: 'Добавление задувной изоляции на чердак, уровень R-30. Экономия в жарком климате Флориды.',
+      unitRu: 'кв. фут',
+      categoryRu: 'Утепление'
+    },
+  ]
+};
+
+// ============================================================
+// STATE
+// ============================================================
+const selected = {}; // id -> { qty, price }
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  // Set default dates
+  const today = new Date();
+  document.getElementById('est_date').value = today.toISOString().split('T')[0];
+  const valid = new Date(today); valid.setDate(valid.getDate() + 30);
+  document.getElementById('est_valid').value = valid.toISOString().split('T')[0];
+  document.getElementById('est_number').value = 'EST-' + String(Math.floor(Math.random()*900)+100);
+
+  // Live sync company name → header logo
+  const companyInput = document.getElementById('company_name');
+  const headerLogo = document.getElementById('header-logo');
+  function updateLogo() {
+    const val = companyInput.value.trim();
+    headerLogo.textContent = val || 'Estimate App';
+  }
+  companyInput.addEventListener('input', updateLogo);
+  updateLogo();
+
+  renderCategory('exterior');
+  renderCategory('interior');
+  renderCategory('drywall');
+  renderCategory('handyman');
+});
+
+function renderCategory(cat) {
+  const container = document.getElementById('services-' + cat);
+  const services = SERVICES[cat];
+  const groups = {};
+  services.forEach(s => {
+    if (!groups[s.category]) groups[s.category] = [];
+    groups[s.category].push(s);
+  });
+
+  let html = '';
+  Object.entries(groups).forEach(([grpName, items]) => {
+    html += `<div class="section-title">${grpName}</div>`;
+    items.forEach(s => {
+      html += buildServiceItem(s);
+    });
+  });
+  container.innerHTML = html;
+}
+
+function buildServiceItem(s) {
+  const name = LANG === 'ru' && s.nameRu ? s.nameRu : s.name;
+  const desc = LANG === 'ru' && s.descRu ? s.descRu : s.desc;
+  const unit = LANG === 'ru' && s.unitRu ? s.unitRu : s.unit;
+  return `
+  <div class="service-item" id="item-${s.id}" onclick="toggleService('${s.id}')">
+    <div class="service-item-header">
+      <div class="service-check" id="check-${s.id}">
+        <svg width="12" height="10" viewBox="0 0 12 10" fill="none" style="display:none" id="checkmark-${s.id}">
+          <path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="service-info">
+        <div class="service-name">${name}</div>
+        <div class="service-desc">${desc}</div>
+      </div>
+      <div class="service-price-badge">${s.priceLabel}</div>
+    </div>
+    <div class="service-controls" id="ctrl-${s.id}">
+      <div class="qty-row">
+        <span class="qty-label">${T('lbl_qty')}</span>
+        <input class="qty-input" type="number" id="qty-${s.id}" value="${s.min}" min="0.1" step="${s.unit.includes('hr') ? 0.5 : (s.price < 1 ? 10 : 1)}"
+          onclick="event.stopPropagation()"
+          oninput="updateQty('${s.id}', this.value)">
+        <span class="qty-unit">${unit}</span>
+        <span class="qty-total" id="total-${s.id}">$${(s.min * s.price).toFixed(2)}</span>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+        <span style="font-size:11px;color:var(--gray-500);">@ $${s.price.toFixed(2)}/${s.unit.split(' ')[0]}</span>
+        <input class="qty-input" type="number" id="custprice-${s.id}" value="${s.price}" min="0" step="0.01"
+          style="width:80px;font-size:12px;padding:4px 8px;"
+          onclick="event.stopPropagation()"
+          oninput="updateCustomPrice('${s.id}', this.value)"
+          placeholder="Custom $">
+        <span style="font-size:11px;color:var(--gray-500);">${T('lbl_custom_price')}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleService(id) {
+  const el = document.getElementById('item-' + id);
+  const isSelected = el.classList.contains('selected');
+  if (isSelected) {
+    el.classList.remove('selected');
+    document.getElementById('checkmark-' + id).style.display = 'none';
+    delete selected[id];
+  } else {
+    el.classList.add('selected');
+    document.getElementById('checkmark-' + id).style.display = 'block';
+    const service = findService(id);
+    const qty = parseFloat(document.getElementById('qty-' + id)?.value || service.min);
+    const price = parseFloat(document.getElementById('custprice-' + id)?.value || service.price);
+    selected[id] = { qty, price, service };
+  }
+  recalcTotal();
+}
+
+function updateQty(id, val) {
+  const qty = parseFloat(val) || 0;
+  const price = parseFloat(document.getElementById('custprice-' + id)?.value || findService(id).price);
+  document.getElementById('total-' + id).textContent = '$' + (qty * price).toFixed(2);
+  if (selected[id]) {
+    selected[id].qty = qty;
+    recalcTotal();
+  }
+}
+
+function updateCustomPrice(id, val) {
+  const price = parseFloat(val) || 0;
+  const qty = parseFloat(document.getElementById('qty-' + id)?.value || findService(id).min);
+  document.getElementById('total-' + id).textContent = '$' + (qty * price).toFixed(2);
+  if (selected[id]) {
+    selected[id].price = price;
+    recalcTotal();
+  }
+}
+
+function findService(id) {
+  for (const cat of ['exterior','interior','drywall','handyman']) {
+    const found = SERVICES[cat].find(s => s.id === id);
+    if (found) return found;
+  }
+  return null;
+}
+
+function recalcTotal() {
+  let subtotal = 0;
+  Object.values(selected).forEach(item => {
+    subtotal += (item.qty || 0) * (item.price || 0);
+  });
+  const discount = parseFloat(document.getElementById('discount_amt')?.value || 0);
+  const total = Math.max(0, subtotal - discount);
+  document.getElementById('total-display').textContent = '$' + total.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+  updateSummaryTab(subtotal, discount, total);
+  updatePDFPreview();
+}
+
+function updateSummaryTab(subtotal, discount, total) {
+  const cont = document.getElementById('summary-content');
+  const keys = Object.keys(selected);
+  if (keys.length === 0) {
+    cont.innerHTML = `<div class="empty-state"><i>📋</i><p>${T('empty_summary')}</p></div>`;
+    return;
+  }
+  let html = '';
+  const grouped = {};
+  keys.forEach(id => {
+    const item = selected[id];
+    const catKey = LANG === 'ru' && item.service.categoryRu ? item.service.categoryRu : item.service.category;
+    if (!grouped[catKey]) grouped[catKey] = [];
+    grouped[catKey].push({id, ...item});
+  });
+  Object.entries(grouped).forEach(([cat, items]) => {
+    html += `<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gray-500);margin:12px 0 6px;">${cat}</div>`;
+    items.forEach(item => {
+      const lineTotal = (item.qty * item.price).toFixed(2);
+      const svcName = LANG === 'ru' && item.service.nameRu ? item.service.nameRu : item.service.name;
+      html += `<div class="estimate-line">
+        <span class="line-name">${svcName}</span>
+        <span class="line-qty">${item.qty} × $${item.price.toFixed(2)}</span>
+        <span class="line-price">$${lineTotal}</span>
+      </div>`;
+    });
+  });
+  html += `<div class="estimate-total-row">
+    <span style="font-size:13px;color:var(--gray-500);">${T('lbl_subtotal')}</span>
+    <span class="font-mono" style="font-size:15px;">$${subtotal.toFixed(2)}</span>
+  </div>`;
+  if (discount > 0) {
+    html += `<div class="tax-row"><span>${T('lbl_discount_line')}</span><span style="color:#E24B4A;">−$${discount.toFixed(2)}</span></div>`;
+  }
+  const deposit = parseFloat(document.getElementById('deposit_amt')?.value || 0);
+  html += `<div class="estimate-total-row">
+    <span class="estimate-total-label">${T('lbl_total')}</span>
+    <span class="estimate-total-val">$${total.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</span>
+  </div>`;
+  if (deposit > 0) {
+    html += `<div class="tax-row"><span>${T('lbl_deposit_req')}</span><span style="color:var(--success);font-weight:600;">$${deposit.toFixed(2)}</span></div>`;
+    html += `<div class="tax-row"><span>${T('lbl_balance')}</span><span style="font-weight:600;">$${Math.max(0,total-deposit).toFixed(2)}</span></div>`;
+  }
+  cont.innerHTML = html;
+}
+
+function updatePDFPreview() {
+  document.getElementById('prev-company').textContent = document.getElementById('company_name')?.value || '—';
+  document.getElementById('prev-client').textContent = document.getElementById('client_name')?.value || '—';
+  document.getElementById('prev-address').textContent = document.getElementById('client_address')?.value || '—';
+  document.getElementById('prev-estnum').textContent = document.getElementById('est_number')?.value || '—';
+  document.getElementById('prev-date').textContent = document.getElementById('est_date')?.value || '—';
+  document.getElementById('prev-valid').textContent = document.getElementById('est_valid')?.value || '—';
+}
+
+// ============================================================
+// TAB NAVIGATION
+// ============================================================
+function switchTab(tab) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  const tabs = ['client','exterior','interior','drywall','handyman','summary'];
+  const idx = tabs.indexOf(tab);
+  document.querySelectorAll('.nav-tab')[idx]?.classList.add('active');
+  if (tab === 'summary') { updatePDFPreview(); recalcTotal(); }
+  window.scrollTo(0,0);
+}
+
+// ============================================================
+// NOTES
+// ============================================================
+function addNote(text) {
+  const ta = document.getElementById('job_notes');
+  if (ta.value && !ta.value.endsWith('\n')) ta.value += '\n';
+  ta.value += '• ' + text;
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+function openModal(title, body, confirmFn) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').textContent = body;
+  document.getElementById('modal-confirm-btn').onclick = () => { closeModal(); confirmFn(); };
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+function clearAll() {
+  openModal(T('modal_clear_title'), T('modal_clear_body'), () => {
+    Object.keys(selected).forEach(id => {
+      delete selected[id];
+      const el = document.getElementById('item-' + id);
+      if (el) { el.classList.remove('selected'); }
+      const cm = document.getElementById('checkmark-' + id);
+      if (cm) cm.style.display = 'none';
+    });
+    ['client_name','client_phone','client_email','client_address','prop_sqft','job_notes','discount_amt','deposit_amt'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    recalcTotal();
+    switchTab('client');
+  });
+}
+
+// ============================================================
+// PDF GENERATION
+// ============================================================
+
+// DejaVu Sans — Cyrillic+Latin subset embedded (no network needed)
+const DEJAVU_REGULAR = "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ArIBBAQAAFwEAADXCAABGwPFAHME5QCeBrQA2QLjAGQIAAEbBAAA1QQAAMMGtADZAzUAXgM1AGIEAAFzBRcArgUXAJ4CiwDbBAABIwM1AIkDxQBgBOUAwQfBAIkHwQCJB8EAYgQ/AI8FeQAQBXkAEAV5ABAFeQAQBXkAEAV5ABAHywAIBZYAcwUOAMkFDgDJBQ4AyQUOAMkCXAA7AlwAogJc//4CXAAGBjMACgX8AMkGTABzBkwAcwZMAHMGTABzBkwAcwa0ARkGTABmBdsAsgXbALIF2wCyBdsAsgTj//wE1wDJBQoAugTnAHsE5wB7BOcAewTnAHsE5wB7BOcAewfbAHsEZgBxBOwAcQTsAHEE7ABxBOwAcQI5/8cCOQCQAjn/3gI5//QE5QBxBRIAugTlAHEE5QBxBOUAcQTlAHEE5QBxBrQA2QTlAEgFEgCuBRIArgUSAK4FEgCuBLwAPQUUALoEvAA9AjkAwQQAAMEEAADHBAAA7gQAALYFDgDJBQ4AyQZK//oE4QDJBZYAcwUUAIcCXADJAlwABgJc/5YIwABUCFwAyQZK//oFrgDJBfwAyQTgACMGBADJBXkAEAV9AMkFfQDJBOEAyQZAAGUFDgDJCJ4AKAUhAIcF/ADJBfwAyQWuAMkGBABUBucAyQYEAMkGTABzBgQAyQTTAMkFlgBzBOP/+gTgACMG4wB5BXsAPQY2AMkFfACvCI4AyQjAAMkGqQA8Bw8AyQV9AMkFlgBvCKMA0wWPAIgE5wB7BO8AcAS3ALoENAC6BYgAawTsAHEHNQBGBEEAhQUzALoFMwC6BNUAugUdAEwGCQC6BTsAugTlAHEFOwC6BRQAugRmAHEEqQA8BLwAPQbXAHAEvAA7BXIAugS6AJYHUgC6B4kAugWnAD4GUQC6BLcAugRkAHEGvADBBNAAdATsAHEE7ABxBQAALwQ0ALoEZABxBCsAbwI5AMECOf/0Ajn/2wc4AEwHMAC6BTcALwTVALoFMwC6BLwAPQU7ALoEAABkCAAAZAS4ATMBVv6JAzUAPwQAALAEAACwBAAAsAQAALAEAAKNBAAAsAQAALAEAACwBAAAsAQAALAEAAKNBAAAsAYAAqMGAACoBgACowYAAqMGAACoBgACowYAAKgAAPzX/XP8tv0M/M/8xwAAAAEAAAdt/h0AAA7+99b6UQ5ZAAEAAAAAAAAAAAAAAAAAAAE+AAEEDgGQAAUAAAUzBZkAAAEeBTMFmQAAA9cAZgISAAACCwYDAwgEAgIEgAACAwAAAAAAAAAAAAAAAFBmRWQAQAAgICIGFP4UAZoHbQHjAAAABQAAAAAAAAAAAAIAAAADAAAAFAADAAEAAAAUAAQAQAAAAAwACAACAAQAfgD/BF8gFCAi//8AAAAgAKAEACATICL////h/8D8xeES4QUAAQAAAAAAAAAAAAAAAAAAAAcAWgADAAEECQAAATAAAAADAAEECQABABYBMAADAAEECQACAAgBRgADAAEECQADABYBMAADAAEECQAEABYBMAADAAEECQAFABgBTgADAAEECQAGABQBZgBDAG8AcAB5AHIAaQBnAGgAdAAgACgAYwApACAAMgAwADAAMwAgAGIAeQAgAEIAaQB0AHMAdAByAGUAYQBtACwAIABJAG4AYwAuACAAQQBsAGwAIABSAGkAZwBoAHQAcwAgAFIAZQBzAGUAcgB2AGUAZAAuAAoAQwBvAHAAeQByAGkAZwBoAHQAIAAoAGMAKQAgADIAMAAwADYAIABiAHkAIABUAGEAdgBtAGoAbwBuAGcAIABCAGEAaAAuACAAQQBsAGwAIABSAGkAZwBoAHQAcwAgAFIAZQBzAGUAcgB2AGUAZAAuAAoARABlAGoAYQBWAHUAIABjAGgAYQBuAGcAZQBzACAAYQByAGUAIABpAG4AIABwAHUAYgBsAGkAYwAgAGQAbwBtAGEAaQBuAAoARABlAGoAYQBWAHUAIABTAGEAbgBzAEIAbwBvAGsAVgBlAHIAcwBpAG8AbgAgADIALgAzADcARABlAGoAYQBWAHUAUwBhAG4AcwADAAAAAAAA/9gAWgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAIAAL//wADAAEAAAAKAOAA6ABQADwMAAfdAAAAAAKCAAAEYAAABdUAAAAAAAAEYAAAAAAAAAAAAAAAAAAABGAAAAAAAAABaAAABGAAAABVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEOAAACdgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWgAAAQ4AAABaAAAAWgAAAQ4AAAAAAAAAAAAAAQ4AAABaAAAAWgAAAQ4AAABaAAAAWgAAAFoAAAFyAAAAWgAAAFoAAAI4AAD7jwAAADwAAAAAAAAAAAAoAB4AMAAHAAMAOgBiAIoAsgDaARYBNAFwAY4BrAABAAcACQAKADwAPgBcAF0AXgABAAMAHgBAAG8ABAAAAAAAAAADASwAAAAoCXUAAAErACgAKAmNAAEBKgAoAAAJlgAAAAQAAAAAAAAAAwEvAAAAKAl1AAABLgAoACgJjQABAS0AKAAACZYAAAAEAAAAAAAAAAMBMgAAACgJdQAAATEAKAAoCY0AAQEwACgAAAlxAAAABAAAAAAAAAADATUAAAAoCWYAAAE0ACgAKAl+AAEBMwAoAAAJcQAAAAQAAAAAAAAABQE4AAAAKAlyAAABOQAoACgJmAABATcAKAAoCYoAAAE5ACgAKAmYAAEBNgAoAAAJgwAAAAQAAAAAAAAAAgBdAAAAKAgAAAAAXQAoAAAIAAABAAQAAAAAAAAABQE8AAAAKAlyAAABOQAoACgJmAABATsAKAAoCYoAAAE5ACgAKAmYAAEBOgAoAAAJgwAAAAQAAAAAAAAAAgAeAAAAKAUCAAAAHgAoAAAFAgABAAQAAAAAAAAAAgBAAAAAKAQoAAAAQAAoAAAEKAABAAQAAAAAAAAAAgBvAAAAKAJWAAAAbwAoAAACVgABAAA=";
+const DEJAVU_BOLD = "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D80JZwABAAgAAgAAAAAAAATNAGYCyQAAA6YBHwQrAMMGtACLBZEAoAgEAEIG+gB7AnMAwwOoALADqACkBC8AKQa0ANkDCgBtA1IAbwMKANEC7AAABZEAYgWRAOcFkQCiBZEAiQWRAFwFkQCeBZEAfwWRAIkFkQB9BZEAagMzAOUDMwCBBrQA2Qa0ANkGtADZBKQAjQgAAIcGMQAKBhkAvAXfAGYGpAC8BXcAvAV3ALwGkQBmBrIAvAL6ALwC+v+NBjMAvAUZALwH9gC8BrIAvAbNAGYF3QC8Bs0AZgYpALwFwwCTBXUACgZ/ALwGMQAKCNMAPQYrACcFy//sBc0AXAOoALAC7AAAA6gAiwa0AM8EAAAABAAAXgVmAFgFugCsBL4AWAW6AFwFbQBYA3sAJwW6AFwFsgCsAr4ArAK+/7wFUgCsAr4ArAhWAKoFsgCsBX8AWAW6AKwFugBcA/IArATDAGoD0wAbBbIAoAU3AB8HZABIBSkAHwU3ABkEqABcBbIBAALsAQQFsgEABrQA2QLJAAADpgEfBZEArgWRAH0FFwBKBZEAGQLsAQQEAAAOBAAAxQgAARsEgwCeBSsAnga0ANkDUgBvCAABGwQAAMUEAACyBrQA2QOBAG0DgQBaBAABbQXjAK4FFwCBAwoA0QQAAQYDgQB7BIMAdQUrAMEISABkCEgAZAhIAGgEpACNBjEACgYxAAoGMQAKBjEACgYxAAoGMQAKCK4AAAXfAGYFdwC8BXcAvAV3ALwFdwC8AvoAFgL6ALwC+gADAvoAQQa0ACEGsgC8Bs0AZgbNAGYGzQBmBs0AZgbNAGYGtAEABs0ALQZ/ALwGfwC8Bn8AvAZ/ALwFy//sBecAvAXBAKwFZgBYBWYAWAVmAFgFZgBYBWYAWAVmAFgIYgBYBL4AWAVtAFgFbQBYBW0AWAVtAFgCvv/VAr4ArAK+/+UCvgAjBX8AWAWyAKwFfwBYBX8AWAV/AFgFfwBYBX8AWAa0ANkFfwBOBbIAoAWyAKAFsgCgBbIAoAU3ABkFugCsBTcAGQK+AKwEAACHBAAAsAQAAOMEAACkBXcAvAV3ALwHBwAKBRkAvAXfAGYFwwCTAvoAvAL6AEEC+v+NCTwAXgkKALwHBwAKBooAvAayALwGKwA7BrIAvAYxAAoGGQC8BhkAvAUZALwHIAB7BXcAvAnLAB4FrwCHBrIAvAayALwGigC8BqUAXgf2ALwGsgC8Bs0AZgayALwF3QC8Bd8AZgV1AAoGKwA7B+8AZgYrACcHbAC8BncApQniALwKmwC8B4QAZAhKALwGGQC8Bd8AgwlkALwGKQCDBWYAWAWWAFgFEACsBC4ArAZ2AHMFbQBYB/YAHgSmAGQFmwCsBZsArAVuAKwF3ABxBooArAWHAKwFfwBYBYcArAW6AKwEvgBYBKMACAU3ABkH8ABxBSkAHwXuAKwFfgCECH8ArAjYAKwGAwAoBzwArAUPAKwEvgCJB8cArAUjAD8FbQBYBW0AWAW2ACgELgCsBL4AWATDAGoCvgCsAr4AIwK+/7wH7gBaB6YArAXgACgFbgCsBZsArAU3ABkFhwCsBAAAbggAAG4FHQEnAVb+aAOBADgAAPzF/W38pPyy/If8sAAAAAEAAAdt/h0AABAh93L5Mg/NAAEAAAAAAAAAAAAAAAAAAAErAAEElQK8AAUAAAUzBZkAAAEeBTMFmQAAA9cAZgISAAACCwgDAwYEAgIEgAACAwAAAAAAAAAAAAAAAFBmRWQAIAAgICIGFP4UAZoHbQHjAAAABQAAAAAAAAAAAAIAAAADAAAAFAADAAEAAAAUAAQAQAAAAAwACAACAAQAfgD/BF8gFCAi//8AAAAgAKAEACATICL////h/8D8xeES4QUAAQAAAAAAAAAAAAAAAAAAAAcAWgADAAEECQAAATAAAAADAAEECQABABYBMAADAAEECQACAAgBRgADAAEECQADACABTgADAAEECQAEACABTgADAAEECQAFABgBbgADAAEECQAGAB4BhgBDAG8AcAB5AHIAaQBnAGgAdAAgACgAYwApACAAMgAwADAAMwAgAGIAeQAgAEIAaQB0AHMAdAByAGUAYQBtACwAIABJAG4AYwAuACAAQQBsAGwAIABSAGkAZwBoAHQAcwAgAFIAZQBzAGUAcgB2AGUAZAAuAAoAQwBvAHAAeQByAGkAZwBoAHQAIAAoAGMAKQAgADIAMAAwADYAIABiAHkAIABUAGEAdgBtAGoAbwBuAGcAIABCAGEAaAAuACAAQQBsAGwAIABSAGkAZwBoAHQAcwAgAFIAZQBzAGUAcgB2AGUAZAAuAAoARABlAGoAYQBWAHUAIABjAGgAYQBuAGcAZQBzACAAYQByAGUAIABpAG4AIABwAHUAYgBsAGkAYwAgAGQAbwBtAGEAaQBuAAoARABlAGoAYQBWAHUAIABTAGEAbgBzAEIAbwBsAGQARABlAGoAYQBWAHUAIABTAGEAbgBzACAAQgBvAGwAZABWAGUAcgBzAGkAbwBuACAAMgAuADMANwBEAGUAagBhAFYAdQBTAGEAbgBzAC0AQgBvAGwAZAAAAAMAAAAAAAD/2ABaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAgAAv//AAM=";
+
+function fetchCyrillicFont() {
+  // Returns synchronously — fonts are embedded in the file
+  return { regular: DEJAVU_REGULAR, bold: DEJAVU_BOLD };
+}
+
+function generatePDF(pdfLang) {
+  // pdfLang: 'en' or 'ru' — language of the PDF document itself
+  if (!pdfLang) pdfLang = 'en';
+  // Helper: translate for PDF (independent of UI language)
+  const TP = (key) => (TRANSLATIONS[pdfLang][key] || TRANSLATIONS.en[key] || key);
+
+  const { jsPDF } = window.jspdf;
+  if (!jsPDF) { alert(T('pdf_loading')); return; }
+  const keys = Object.keys(selected);
+  if (keys.length === 0) {
+    alert(T('pdf_alert_empty'));
+    switchTab('exterior');
+    return;
+  }
+
+  // Show loading indicator
+  const btn = document.querySelector('[onclick*="generatePDF"]');
+  const origText = btn ? btn.innerHTML : '';
+  if (btn) btn.innerHTML = '⏳...';
+
+  // Load embedded Cyrillic fonts (synchronous — no network needed)
+  const cyrFonts = fetchCyrillicFont();
+
+  const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+  const W = 612, H = 792;
+  const margin = 48;
+  let y = margin;
+
+  // Register embedded fonts
+  let FONT_REG = 'helvetica';
+  let FONT_BOLD_NAME = 'helvetica';
+  try {
+    doc.addFileToVFS('DejaVuSans.ttf', cyrFonts.regular);
+    doc.addFont('DejaVuSans.ttf', 'DejaVu', 'normal');
+    doc.addFileToVFS('DejaVuSans-Bold.ttf', cyrFonts.bold);
+    doc.addFont('DejaVuSans-Bold.ttf', 'DejaVu', 'bold');
+    FONT_REG = 'DejaVu';
+    FONT_BOLD_NAME = 'DejaVu';
+  } catch(e) { console.warn('Font embed failed:', e); }
+
+  // Helper: text is now always safe — font covers full Cyrillic
+  const safeText = (str) => str || '';
+
+  // Colors
+  const ORANGE = [232, 84, 26];
+  const DARK = [26, 22, 18];
+  const GRAY = [120, 110, 100];
+  const LGRAY = [230, 225, 220];
+  const WHITE = [253, 250, 247];
+  const GREEN = [45, 125, 58];
+
+  // Helper functions
+  const setFont = (style, size, color) => {
+    doc.setFont(FONT_REG, style === 'bold' ? 'bold' : 'normal');
+    doc.setFontSize(size);
+    if (color) doc.setTextColor(...color);
+  };
+  const drawLine = (x1, y1, x2, y2, color, w) => {
+    doc.setDrawColor(...(color||LGRAY));
+    doc.setLineWidth(w||0.5);
+    doc.line(x1, y1, x2, y2);
+  };
+  const fillRect = (x, yy, w, h, color) => {
+    doc.setFillColor(...color);
+    doc.rect(x, yy, w, h, 'F');
+  };
+
+  // ---- HEADER ----
+  fillRect(0, 0, W, 90, DARK);
+  // Right side header
+  const company_name = document.getElementById('company_name').value || 'Your Company';
+  const company_phone = document.getElementById('company_phone').value || '';
+  const company_email = document.getElementById('company_email').value || '';
+  const company_license = document.getElementById('company_license').value || '';
+
+  // Top-left: big company name
+  setFont('bold', 22, [255,255,255]);
+  doc.text(safeText(company_name), margin, 42);
+  setFont('normal', 9, [180, 165, 150]);
+  doc.text(pdfLang === 'ru' ? 'Эстимейт / Инвойс · Флорида' : 'Estimate / Invoice · Florida', margin, 58);
+  if (company_license) doc.text((pdfLang === 'ru' ? 'Лиц: ' : 'Lic: ') + company_license, margin, 70);
+
+  // Top-right: contact
+  setFont('bold', 11, [255,255,255]);
+  if (company_phone) doc.text(company_phone, W - margin, 38, { align: 'right' });
+  setFont('normal', 9, [180, 165, 150]);
+  if (company_email) doc.text(company_email, W - margin, 52, { align: 'right' });
+
+  y = 110;
+
+  // ---- ESTIMATE INFO BOX ----
+  const estNum = document.getElementById('est_number').value || 'EST-001';
+  const estDate = document.getElementById('est_date').value || '';
+  const estValid = document.getElementById('est_valid').value || '';
+
+  fillRect(margin, y, W - margin*2, 52, [248, 244, 240]);
+  doc.setDrawColor(...LGRAY); doc.setLineWidth(0.5);
+  doc.rect(margin, y, W - margin*2, 52, 'S');
+
+  setFont('bold', 9, GRAY);
+  doc.text(pdfLang === 'ru' ? 'НОМЕР ЭСТИМЕЙТА' : 'ESTIMATE NUMBER', margin + 12, y + 16);
+  setFont('bold', 14, DARK);
+  doc.text(estNum, margin + 12, y + 34);
+
+  setFont('bold', 9, GRAY);
+  doc.text(pdfLang === 'ru' ? 'ДАТА ВЫДАЧИ' : 'DATE ISSUED', W/2 - 40, y + 16);
+  setFont('normal', 12, DARK);
+  doc.text(estDate, W/2 - 40, y + 34);
+
+  setFont('bold', 9, GRAY);
+  doc.text(pdfLang === 'ru' ? 'ДЕЙСТВУЕТ ДО' : 'VALID UNTIL', W - margin - 120, y + 16);
+  setFont('normal', 12, DARK);
+  doc.text(estValid, W - margin - 120, y + 34);
+
+  y += 70;
+
+  // ---- CLIENT & PROPERTY ----
+  setFont('bold', 9, ORANGE);
+  doc.text(pdfLang === 'ru' ? 'КЛИЕНТ:' : 'BILL TO:', margin, y);
+  setFont('bold', 9, GRAY);
+  doc.text(pdfLang === 'ru' ? 'ОБЪЕКТ:' : 'PROPERTY:', W/2, y);
+
+  y += 14;
+  const clientName = safeText(document.getElementById('client_name').value || '—');
+  const clientPhone = document.getElementById('client_phone').value || '';
+  const clientEmail = document.getElementById('client_email').value || '';
+  const clientAddr = safeText(document.getElementById('client_address').value || '—');
+  const propType = safeText(document.getElementById('prop_type').value || '');
+  const propSqft = document.getElementById('prop_sqft').value || '';
+
+  setFont('bold', 11, DARK);
+  doc.text(clientName, margin, y);
+  setFont('normal', 10, DARK);
+  if (clientPhone) { y += 14; doc.text(clientPhone, margin, y); }
+  if (clientEmail) { y += 14; doc.text(clientEmail, margin, y); }
+
+  let yRight = y - (clientPhone ? 14:0) - (clientEmail ? 14:0);
+  setFont('normal', 10, DARK);
+  doc.text(clientAddr, W/2, yRight);
+  yRight += 14;
+  if (propType) doc.text(propType, W/2, yRight);
+  yRight += 14;
+  if (propSqft) doc.text('~' + parseInt(propSqft).toLocaleString() + (pdfLang === 'ru' ? ' кв. фут' : ' sq ft'), W/2, yRight);
+
+  y += 28;
+  drawLine(margin, y, W - margin, y, LGRAY, 0.5);
+  y += 18;
+
+  // ---- SERVICES TABLE ----
+  // Header
+  fillRect(margin, y, W - margin*2, 22, DARK);
+  setFont('bold', 9, WHITE);
+  doc.text(pdfLang === 'ru' ? 'ОПИСАНИЕ УСЛУГИ' : 'SERVICE DESCRIPTION', margin + 10, y + 15);
+  doc.text(pdfLang === 'ru' ? 'КОЛ-ВО' : 'QTY', W - margin - 175, y + 15, { align: 'right' });
+  doc.text(pdfLang === 'ru' ? 'ЦЕНА/ЕД.' : 'UNIT PRICE', W - margin - 95, y + 15, { align: 'right' });
+  doc.text(pdfLang === 'ru' ? 'СУММА' : 'AMOUNT', W - margin - 5, y + 15, { align: 'right' });
+  y += 22;
+
+  // Group services
+  let subtotal = 0;
+  let prevCat = '';
+
+  const addPageIfNeeded = (needed) => {
+    if (y + needed > H - 120) {
+      doc.addPage();
+      y = margin;
+      fillRect(0, 0, W, 30, DARK);
+      setFont('bold', 10, [255,255,255]);
+      doc.text(safeText(company_name), margin, 20);
+      setFont('normal', 10, [180,165,150]);
+      doc.text(estNum + (pdfLang === 'ru' ? ' — продолжение' : ' — continued'), W - margin, 20, { align: 'right' });
+      y = 45;
+    }
+  };
+
+  keys.forEach((id, idx) => {
+    const item = selected[id];
+    const lineTotal = item.qty * item.price;
+    subtotal += lineTotal;
+
+    // Use RU or EN service fields based on pdfLang
+    const svcName = pdfLang === 'ru' && item.service.nameRu ? item.service.nameRu : item.service.name;
+    const svcDesc = pdfLang === 'ru' && item.service.descRu ? item.service.descRu : item.service.desc;
+    const svcCat  = pdfLang === 'ru' && item.service.categoryRu ? item.service.categoryRu : item.service.category;
+    const svcUnit = pdfLang === 'ru' && item.service.unitRu ? item.service.unitRu : item.service.unit;
+
+    if (svcCat !== prevCat) {
+      addPageIfNeeded(36);
+      prevCat = svcCat;
+      fillRect(margin, y, W - margin*2, 18, [240, 235, 230]);
+      setFont('bold', 8, ORANGE);
+      doc.text(svcCat.toUpperCase(), margin + 10, y + 13);
+      y += 18;
+    }
+
+    addPageIfNeeded(38);
+    const rowBg = idx % 2 === 0 ? WHITE : [248, 244, 240];
+    fillRect(margin, y, W - margin*2, 36, rowBg);
+    doc.setDrawColor(...LGRAY); doc.setLineWidth(0.3);
+    doc.rect(margin, y, W - margin*2, 36, 'S');
+
+    setFont('bold', 10, DARK);
+    doc.text(svcName, margin + 10, y + 14);
+    setFont('normal', 8, GRAY);
+    const descLines = doc.splitTextToSize(svcDesc, 260);
+    doc.text(descLines[0], margin + 10, y + 26);
+
+    setFont('normal', 10, DARK);
+    const qtyStr = item.qty % 1 === 0 ? item.qty.toString() : item.qty.toFixed(1);
+    doc.text(qtyStr, W - margin - 175, y + 14, { align: 'right' });
+    doc.text('$' + item.price.toFixed(2), W - margin - 95, y + 14, { align: 'right' });
+    setFont('bold', 10, DARK);
+    doc.text('$' + lineTotal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}), W - margin - 5, y + 14, { align: 'right' });
+
+    setFont('normal', 8, GRAY);
+    doc.text(svcUnit, W - margin - 175, y + 26, { align: 'right' });
+
+    y += 36;
+  });
+
+  y += 10;
+  addPageIfNeeded(80);
+
+  // ---- TOTALS ----
+  const discount = parseFloat(document.getElementById('discount_amt')?.value || 0);
+  const deposit = parseFloat(document.getElementById('deposit_amt')?.value || 0);
+  const total = Math.max(0, subtotal - discount);
+  const balance = Math.max(0, total - deposit);
+
+  const txX = W - margin - 200;
+  drawLine(txX, y, W - margin, y, LGRAY, 0.5);
+  y += 14;
+
+  setFont('normal', 10, GRAY);
+  doc.text(pdfLang === 'ru' ? 'Подытог:' : 'Subtotal:', txX, y);
+  setFont('normal', 10, DARK);
+  doc.text('$' + subtotal.toLocaleString('en-US', {minimumFractionDigits:2}), W - margin, y, { align: 'right' });
+  y += 16;
+
+  if (discount > 0) {
+    setFont('normal', 10, GRAY);
+    doc.text(pdfLang === 'ru' ? 'Скидка:' : 'Discount:', txX, y);
+    doc.setTextColor(220, 60, 60);
+    doc.text('-$' + discount.toFixed(2), W - margin, y, { align: 'right' });
+    y += 16;
+  }
+
+  fillRect(txX - 10, y - 4, W - margin - txX + 10, 26, DARK);
+  setFont('bold', 12, WHITE);
+  doc.text(pdfLang === 'ru' ? 'ИТОГО:' : 'TOTAL:', txX, y + 16);
+  setFont('bold', 14, ORANGE);
+  doc.text('$' + total.toLocaleString('en-US', {minimumFractionDigits:2}), W - margin - 5, y + 16, { align: 'right' });
+  y += 30;
+
+  if (deposit > 0) {
+    y += 6;
+    setFont('normal', 10, GRAY);
+    doc.text(pdfLang === 'ru' ? 'Депозит:' : 'Deposit Due:', txX, y);
+    setFont('bold', 10, GREEN);
+    doc.text('$' + deposit.toFixed(2), W - margin, y, { align: 'right' });
+    y += 16;
+    setFont('normal', 10, GRAY);
+    doc.text(pdfLang === 'ru' ? 'Остаток по завершении:' : 'Balance on Completion:', txX, y);
+    setFont('bold', 10, DARK);
+    doc.text('$' + balance.toLocaleString('en-US', {minimumFractionDigits:2}), W - margin, y, { align: 'right' });
+  }
+
+  y += 20;
+
+  // ---- PAYMENT TERMS ----
+  // Use RU payment term from translations if pdfLang=ru, else use form value
+  const payTermsRaw = document.getElementById('pay_terms')?.value || '';
+  // Map EN pay terms to RU equivalents
+  const payTermsMap = {
+    '50% deposit, balance upon completion': '50% депозит, остаток по завершении',
+    'Payment due upon completion': 'Оплата по завершении работ',
+    'Net 15 days after completion': 'Оплата в течение 15 дней после завершения',
+    'Net 30 days after completion': 'Оплата в течение 30 дней после завершения',
+    'Full payment upfront': 'Полная оплата вперёд',
+    'Weekly billing': 'Еженедельная оплата',
+  };
+  const payTermsRU = {
+    '50% депозит, остаток по завершении': '50% депозит, остаток по завершении',
+    'Оплата по завершении работ': 'Оплата по завершении работ',
+    'Оплата в течение 15 дней': 'Оплата в течение 15 дней после завершения',
+    'Оплата в течение 30 дней': 'Оплата в течение 30 дней после завершения',
+    'Полная оплата вперёд': 'Полная оплата вперёд',
+    'Еженедельная оплата': 'Еженедельная оплата',
+  };
+  let payTermsFinal = payTermsRaw;
+  if (pdfLang === 'ru') {
+    payTermsFinal = payTermsMap[payTermsRaw] || payTermsRU[payTermsRaw] || payTermsRaw;
+  }
+
+  addPageIfNeeded(50);
+  fillRect(margin, y, W - margin*2, 28, [232, 84, 26, 15]);
+  doc.setDrawColor(...ORANGE); doc.setLineWidth(0.5);
+  doc.rect(margin, y, W - margin*2, 28, 'S');
+  setFont('bold', 8, ORANGE);
+  doc.text(pdfLang === 'ru' ? 'УСЛОВИЯ ОПЛАТЫ:' : 'PAYMENT TERMS:', margin + 10, y + 11);
+  setFont('normal', 10, DARK);
+  doc.text(payTermsFinal, margin + 10, y + 23);
+  y += 38;
+
+  // ---- NOTES ----
+  const notesRaw = document.getElementById('job_notes')?.value?.trim() || '';
+  if (notesRaw) {
+    addPageIfNeeded(60);
+    setFont('bold', 9, GRAY);
+    doc.text(pdfLang === 'ru' ? 'ОБЪЁМ РАБОТ / ЗАМЕТКИ:' : 'SCOPE OF WORK / NOTES:', margin, y);
+    y += 12;
+    setFont('normal', 9, DARK);
+    const noteLines = doc.splitTextToSize(notesRaw, W - margin * 2);
+    noteLines.forEach(line => {
+      addPageIfNeeded(14);
+      doc.text(line, margin, y);
+      y += 13;
+    });
+    y += 6;
+  }
+
+  // ---- TERMS & CONDITIONS ----
+  // Always use the correct language version from translations,
+  // regardless of what's currently in the textarea
+  const enTerms = TRANSLATIONS.en.std_terms_text;
+  const ruTerms = TRANSLATIONS.ru.std_terms_text;
+  const taValue = document.getElementById('std_terms')?.value?.trim() || '';
+
+  let termsFinal;
+  if (pdfLang === 'ru') {
+    // Use RU terms: if textarea has EN default, replace with RU; if it has custom text keep it
+    if (taValue === '' || taValue === enTerms.trim()) {
+      termsFinal = ruTerms;
+    } else if (taValue === ruTerms.trim()) {
+      termsFinal = ruTerms;
+    } else {
+      // Custom text — use as-is
+      termsFinal = taValue;
+    }
+  } else {
+    // EN PDF: if textarea has RU default, replace with EN
+    if (taValue === '' || taValue === ruTerms.trim()) {
+      termsFinal = enTerms;
+    } else {
+      termsFinal = taValue;
+    }
+  }
+
+  if (termsFinal) {
+    addPageIfNeeded(80);
+    drawLine(margin, y, W - margin, y, LGRAY, 0.5);
+    y += 14;
+    setFont('bold', 9, GRAY);
+    doc.text(pdfLang === 'ru' ? 'УСЛОВИЯ ДОГОВОРА:' : 'TERMS & CONDITIONS:', margin, y);
+    y += 12;
+    setFont('normal', 8, GRAY);
+    const termLines = doc.splitTextToSize(termsFinal, W - margin * 2);
+    termLines.forEach(line => {
+      addPageIfNeeded(12);
+      doc.text(line, margin, y);
+      y += 12;
+    });
+    y += 8;
+  }
+
+  // ---- SIGNATURE ----
+  addPageIfNeeded(100);
+  y = Math.max(y + 20, H - 140);
+  drawLine(margin, y, margin + 220, y, DARK, 0.5);
+  drawLine(W - margin - 220, y, W - margin, y, DARK, 0.5);
+  y += 12;
+  setFont('normal', 8, GRAY);
+  doc.text(pdfLang === 'ru' ? 'Подпись клиента' : 'Client Signature', margin, y);
+  doc.text(pdfLang === 'ru' ? 'Дата' : 'Date', margin + 240, y);
+  doc.text(pdfLang === 'ru' ? 'Подпись подрядчика' : 'Contractor Signature', W - margin - 220, y);
+  doc.text(pdfLang === 'ru' ? 'Дата' : 'Date', W - margin - 60, y);
+
+  // ---- FOOTER ----
+  fillRect(0, H - 28, W, 28, DARK);
+  setFont('normal', 8, [140, 130, 120]);
+  const footerCompany = company_name || (pdfLang === 'ru' ? 'Ваша Компания' : 'Your Company');
+  doc.text(footerCompany + (pdfLang === 'ru' ? ' · Калькулятор эстимейта · Флорида · ' : ' · Estimate Calculator · Florida · ') + new Date().toLocaleDateString('en-US'), W/2, H - 10, { align: 'center' });
+
+  // ---- SAVE ----
+  if (btn) btn.innerHTML = origText;
+  const rawClient = document.getElementById('client_name').value || (pdfLang === 'ru' ? 'Клиент' : 'Client');
+  // Transliterate Cyrillic for filename
+  const cyrMap = {'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ё':'yo','ж':'zh','з':'z','и':'i','й':'y','к':'k','л':'l','м':'m','н':'n','о':'o','п':'p','р':'r','с':'s','т':'t','у':'u','ф':'f','х':'kh','ц':'ts','ч':'ch','ш':'sh','щ':'sch','ъ':'','ы':'y','ь':'','э':'e','ю':'yu','я':'ya'};
+  const safeClient = rawClient.split('').map(c => cyrMap[c.toLowerCase()] !== undefined ? cyrMap[c.toLowerCase()] : c).join('').replace(/[^\w\s\-]/g,'').replace(/\s+/g,'-').substring(0,30) || 'Client';
+  const langSuffix = pdfLang === 'ru' ? '-RU' : '-EN';
+  const fname = `Estimate-${estNum}-${safeClient}${langSuffix}.pdf`;
+  doc.save(fname);
+}
+
+// ============================================================
+// PREVENT DOUBLE TAP ZOOM on iOS
+// ============================================================
+document.querySelectorAll('button, .nav-tab, .service-item, .cat-btn, .notes-tag, .pill-toggle').forEach(el => {
+  el.addEventListener('touchend', e => { e.preventDefault(); el.click(); }, { passive: false });
+});
+</script>
+</body>
+</html>
